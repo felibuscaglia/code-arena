@@ -1,0 +1,34 @@
+import Link from "next/link"
+import { ArrowLeft } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Logo } from "@/components/ui/logo"
+import { RoomConfigForm } from "./_components/room-config-form"
+
+export default function CreateRoomPage() {
+  return (
+    <div className="flex min-h-svh flex-col items-center px-6 py-12">
+      <div className="flex w-full max-w-2xl flex-col gap-12">
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/">
+              <ArrowLeft data-icon="inline-start" />
+              Back
+            </Link>
+          </Button>
+          <Logo />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <h1 className="font-heading text-2xl font-bold tracking-tight">
+            Create a room
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Configure your battle and share the link with your opponents.
+          </p>
+        </div>
+
+        <RoomConfigForm />
+      </div>
+    </div>
+  )
+}

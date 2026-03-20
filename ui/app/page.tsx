@@ -8,6 +8,7 @@ import {
   Link as LinkIcon,
   ArrowRight,
 } from "lucide-react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Logo, LogoIcon } from "@/components/ui/logo"
@@ -142,15 +143,20 @@ export default function LandingPage() {
           </div>
 
           {/* CTAs */}
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Button size="lg">
-              Create Room
-              <ArrowRight data-icon="inline-end" />
+          <div className="flex flex-col items-center gap-4">
+            <Button size="lg" asChild>
+              <Link href="/create">
+                Create Room
+                <ArrowRight data-icon="inline-end" />
+              </Link>
             </Button>
-            <JoinRoomCTA />
-            <Button variant="ghost" size="lg">
-              Browse Public Rooms
-            </Button>
+            <div className="flex items-center gap-3">
+              <JoinRoomCTA />
+              <span className="text-xs text-muted-foreground/40">or</span>
+              <Button variant="ghost" size="sm">
+                Browse Public Rooms
+              </Button>
+            </div>
           </div>
 
           <p className="text-xs text-muted-foreground/70">
@@ -240,7 +246,7 @@ export default function LandingPage() {
           {[
             { value: "< 1s", label: "Room creation" },
             { value: "3", label: "Scoring dimensions" },
-            { value: "∞", label: "Rounds per match" },
+            { value: "Custom", label: "Rounds per match" },
           ].map((stat) => (
             <div key={stat.label} className="flex flex-col gap-1">
               <span className="font-heading text-2xl font-bold text-primary sm:text-3xl">
@@ -265,9 +271,11 @@ export default function LandingPage() {
             Create a room and send the link. Your first battle starts now.
           </p>
           <div className="flex gap-3">
-            <Button size="lg">
-              Create Room
-              <ArrowRight data-icon="inline-end" />
+            <Button size="lg" asChild>
+              <Link href="/create">
+                Create Room
+                <ArrowRight data-icon="inline-end" />
+              </Link>
             </Button>
             <Button variant="outline" size="lg">
               Browse Public Rooms

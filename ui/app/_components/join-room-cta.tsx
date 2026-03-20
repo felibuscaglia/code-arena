@@ -26,7 +26,7 @@ export function JoinRoomCTA() {
     return (
       <Button
         variant="outline"
-        size="lg"
+        size="sm"
         onClick={() => setIsOpen(true)}
       >
         Join Room
@@ -41,8 +41,8 @@ export function JoinRoomCTA() {
           ref={inputRef}
           value={code}
           onChange={(e) => setCode(e.target.value)}
-          placeholder="Paste invite code or link"
-          className="h-9 w-56 pr-8"
+          placeholder="Invite code or link"
+          className="h-8 w-48 pr-7 text-xs"
         />
         <button
           type="button"
@@ -53,10 +53,10 @@ export function JoinRoomCTA() {
           className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
           aria-label="Cancel"
         >
-          <X className="size-3.5" />
+          <X className="size-3" />
         </button>
       </div>
-      <Button type="submit" size="lg" disabled={!code.trim()}>
+      <Button type="submit" size="sm" disabled={!code.trim()}>
         Join
         <ArrowRight data-icon="inline-end" />
       </Button>
