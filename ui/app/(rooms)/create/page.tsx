@@ -6,8 +6,16 @@ import { RoomConfigForm } from "./_components/room-config-form"
 
 export default function CreateRoomPage() {
   return (
-    <div className="flex min-h-svh flex-col items-center px-6 py-12">
-      <div className="flex w-full max-w-2xl flex-col gap-12">
+    <div className="relative flex min-h-svh flex-col items-center bg-grid px-6 py-12">
+      {/* Background glow */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute top-32 left-1/2 -translate-x-1/2"
+      >
+        <div className="h-[400px] w-[600px] rounded-full bg-primary/5 blur-[120px]" />
+      </div>
+
+      <div className="relative flex w-full max-w-2xl flex-col gap-12">
         <div className="flex items-center justify-between">
           <Button variant="ghost" size="sm" asChild>
             <Link href="/">

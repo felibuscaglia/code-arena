@@ -103,7 +103,7 @@ const steps = [
 
 export default function LandingPage() {
   return (
-    <div className="flex min-h-svh flex-col">
+    <div className="flex min-h-svh flex-col bg-grid">
       {/* Navigation */}
       <header className="fixed top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-lg">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-6">
@@ -115,7 +115,7 @@ export default function LandingPage() {
       </header>
 
       {/* Hero */}
-      <section className="relative flex flex-1 flex-col items-center justify-center px-6 pt-14">
+      <section className="relative flex flex-col items-center px-6 pt-14">
         {/* Background glow */}
         <div
           aria-hidden="true"
@@ -124,13 +124,16 @@ export default function LandingPage() {
           <div className="h-[500px] w-[800px] rounded-full bg-primary/5 blur-[120px]" />
         </div>
 
-        <div className="relative mx-auto flex max-w-2xl flex-col items-center gap-8 py-32 text-center">
-          <Badge variant="secondary" className="gap-1.5 font-mono text-xs">
+        <div className="relative mx-auto flex max-w-2xl flex-col items-center gap-8 pt-36 pb-16 text-center">
+          <Badge variant="secondary" className="animate-fade-in-up gap-1.5 font-mono text-xs">
             <span className="inline-block size-1.5 animate-pulse rounded-full bg-emerald-500" />
             Now in early access
           </Badge>
 
-          <div className="flex flex-col gap-4">
+          <div
+            className="flex flex-col gap-4 animate-fade-in-up"
+            style={{ animationDelay: "0.1s" }}
+          >
             <h1 className="font-heading text-4xl leading-[1.1] font-bold tracking-tight [word-spacing:-0.3em] sm:text-5xl md:text-6xl">
               Code. <br />Compete.{" "}<br />
               <span className="text-primary">Conquer.</span>
@@ -143,7 +146,10 @@ export default function LandingPage() {
           </div>
 
           {/* CTAs */}
-          <div className="flex flex-col items-center gap-4">
+          <div
+            className="flex flex-col items-center gap-4 animate-fade-in-up"
+            style={{ animationDelay: "0.2s" }}
+          >
             <Button size="lg" asChild>
               <Link href="/create">
                 Create Room
@@ -159,9 +165,89 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <p className="text-xs text-muted-foreground/70">
+          <p
+            className="text-xs text-muted-foreground/70 animate-fade-in-up"
+            style={{ animationDelay: "0.3s" }}
+          >
             Free to play — no account required to join a room
           </p>
+        </div>
+
+        {/* Battle Preview */}
+        <div
+          className="animate-fade-in-up relative mx-auto w-full max-w-md pb-24"
+          style={{ animationDelay: "0.4s" }}
+        >
+          <div className="overflow-hidden rounded-xl border border-border/50 bg-card/80 shadow-2xl shadow-primary/5 backdrop-blur-sm">
+            <div className="flex items-center gap-2 border-b border-border/50 bg-muted/30 px-4 py-2.5">
+              <div className="flex gap-1.5">
+                <div className="size-2 rounded-full bg-foreground/15" />
+                <div className="size-2 rounded-full bg-foreground/15" />
+                <div className="size-2 rounded-full bg-foreground/15" />
+              </div>
+              <span className="text-[10px] text-muted-foreground/50">
+                battle — round 1 of 3
+              </span>
+            </div>
+            <div className="space-y-3 p-4">
+              <div className="flex items-center gap-3">
+                <span className="size-1.5 rounded-full bg-emerald-500" />
+                <span className="w-16 text-[11px] text-muted-foreground">
+                  you
+                </span>
+                <div className="h-1 flex-1 overflow-hidden rounded-full bg-muted">
+                  <div className="h-full w-[72%] rounded-full bg-emerald-500/80" />
+                </div>
+                <span className="w-8 text-right text-[10px] tabular-nums text-emerald-500">
+                  72%
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="size-1.5 rounded-full bg-primary" />
+                <span className="w-16 text-[11px] text-muted-foreground">
+                  rival
+                </span>
+                <div className="h-1 flex-1 overflow-hidden rounded-full bg-muted">
+                  <div className="h-full w-[48%] rounded-full bg-primary/80" />
+                </div>
+                <span className="w-8 text-right text-[10px] tabular-nums text-primary">
+                  48%
+                </span>
+              </div>
+            </div>
+            <div className="border-t border-border/30 bg-background/60 p-4">
+              <div className="mb-2 text-[10px] text-muted-foreground/40">
+                solution.js
+              </div>
+              <div className="space-y-0.5 font-mono text-[11px] leading-relaxed">
+                <div>
+                  <span className="text-primary">function</span>{" "}
+                  <span className="text-foreground/80">twoSum</span>
+                  <span className="text-muted-foreground">
+                    (nums, target) {"{"}
+                  </span>
+                </div>
+                <div className="pl-4">
+                  <span className="text-primary">const</span>{" "}
+                  <span className="text-foreground/80">seen</span>{" "}
+                  <span className="text-muted-foreground">= new Map();</span>
+                </div>
+                <div className="pl-4">
+                  <span className="text-primary">for</span>{" "}
+                  <span className="text-muted-foreground">
+                    (const [i, n] of nums.entries()) {"{"}
+                  </span>
+                </div>
+                <div className="flex items-center pl-8">
+                  <span className="text-primary">if</span>{" "}
+                  <span className="text-muted-foreground">
+                    (seen.has(target - n))
+                  </span>
+                  <span className="animate-blink ml-0.5 inline-block h-3.5 w-[5px] bg-primary/70" />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -182,7 +268,7 @@ export default function LandingPage() {
             {features.map((feature) => (
               <div
                 key={feature.title}
-                className="group flex flex-col gap-3 rounded-xl border border-border/50 p-6 transition-colors hover:border-border hover:bg-muted/30"
+                className="group flex flex-col gap-3 rounded-xl border border-border/50 bg-card/50 p-6 transition-all hover:border-border hover:bg-muted/30 hover:shadow-lg hover:shadow-primary/5"
               >
                 <div className="flex items-center gap-3">
                   <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">

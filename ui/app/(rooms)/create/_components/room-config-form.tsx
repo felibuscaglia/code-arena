@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowRight } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { ArrowRight, Info, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,7 +17,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Switch } from "@/components/ui/switch"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { Separator } from "@/components/ui/separator"
+import { rooms } from "@/lib/api/services"
 
 type Mode = "ffa" | "2v2"
 
@@ -40,12 +41,47 @@ const ROUNDS = Array.from({ length: 10 }, (_, i) => String(i + 1))
 const MAX_PLAYERS = Array.from({ length: 7 }, (_, i) => String(i + 2))
 
 export function RoomConfigForm() {
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
+  const [name, setName] = useState("")
   const [mode, setMode] = useState<Mode>("ffa")
+  const [rounds, setRounds] = useState("3")
+  const [roundTime, setRoundTime] = useState("10")
+  const [difficulty, setDifficulty] = useState("medium")
+  const [languages, setLanguages] = useState<string[]>(["javascript"])
+  const [maxPlayers, setMaxPlayers] = useState("4")
+  const [isPublic, setIsPublic] = useState(false)
+
+  function toggleLanguage(lang: string, checked: boolean) {
+    setLanguages((prev) =>
+      checked ? [...prev, lang] : prev.filter((l) => l !== lang),
+    )
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setIsLoading(true)
+    try {
+      const { data } = await rooms.create({
+        name,
+        mode,
+        rounds: Number(rounds),
+        roundTime: Number(roundTime),
+        difficulty,
+        languages,
+        ...(mode === "ffa" && { maxPlayers: Number(maxPlayers) }),
+        public: isPublic,
+      })
+      router.push(`/room/${data.roomId}`)
+    } catch {
+      setIsLoading(false)
+    }
+  }
 
   return (
-    <form onSubmit={(e) => e.preventDefault()} className="flex flex-col gap-10">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-10">
       {/* ── Basics ── */}
-      <section className="flex flex-col gap-6">
+      <section className="flex flex-col gap-6 rounded-xl border border-border/40 bg-card/50 p-6">
         <div>
           <h2 className="font-heading text-sm font-semibold">Basics</h2>
           <p className="text-xs text-muted-foreground">
@@ -60,6 +96,8 @@ export function RoomConfigForm() {
               id="room-name"
               placeholder="e.g. Friday Night Showdown"
               className="h-9"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
           </fieldset>
 
@@ -87,14 +125,20 @@ export function RoomConfigForm() {
               {mode === "2v2" &&
                 "Team up with a partner. Shared editor and voice chat included."}
             </p>
+            {mode === "2v2" && (
+              <div className="flex items-start gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5">
+                <Info className="mt-0.5 size-3.5 shrink-0 text-primary" />
+                <p className="text-xs text-primary/80">
+                  Each match is a head-to-head between two teams of two — four players total.
+                </p>
+              </div>
+            )}
           </fieldset>
         </div>
       </section>
 
-      <Separator />
-
       {/* ── Match Settings ── */}
-      <section className="flex flex-col gap-6">
+      <section className="flex flex-col gap-6 rounded-xl border border-border/40 bg-card/50 p-6">
         <div>
           <h2 className="font-heading text-sm font-semibold">Match settings</h2>
           <p className="text-xs text-muted-foreground">
@@ -105,7 +149,7 @@ export function RoomConfigForm() {
         <div className="grid gap-6 sm:grid-cols-2">
           <fieldset className="flex flex-col gap-2">
             <Label htmlFor="rounds">Rounds</Label>
-            <Select defaultValue="3">
+            <Select value={rounds} onValueChange={setRounds}>
               <SelectTrigger id="rounds" className="w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -121,7 +165,7 @@ export function RoomConfigForm() {
 
           <fieldset className="flex flex-col gap-2">
             <Label htmlFor="time-limit">Time per round</Label>
-            <Select defaultValue="10">
+            <Select value={roundTime} onValueChange={setRoundTime}>
               <SelectTrigger id="time-limit" className="w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -137,7 +181,7 @@ export function RoomConfigForm() {
 
           <fieldset className="flex flex-col gap-3 sm:col-span-2">
             <Label>Difficulty</Label>
-            <RadioGroup defaultValue="medium" className="flex gap-6">
+            <RadioGroup value={difficulty} onValueChange={setDifficulty} className="flex gap-6">
               {DIFFICULTIES.map((d) => (
                 <div key={d.value} className="flex items-center gap-2">
                   <RadioGroupItem value={d.value} id={`diff-${d.value}`} />
@@ -157,10 +201,8 @@ export function RoomConfigForm() {
         </div>
       </section>
 
-      <Separator />
-
       {/* ── Preferences ── */}
-      <section className="flex flex-col gap-6">
+      <section className="flex flex-col gap-6 rounded-xl border border-border/40 bg-card/50 p-6">
         <div>
           <h2 className="font-heading text-sm font-semibold">Preferences</h2>
           <p className="text-xs text-muted-foreground">
@@ -173,13 +215,25 @@ export function RoomConfigForm() {
             <Label>Languages</Label>
             <div className="flex gap-6">
               <div className="flex items-center gap-2">
-                <Checkbox id="lang-js" defaultChecked />
+                <Checkbox
+                  id="lang-js"
+                  checked={languages.includes("javascript")}
+                  onCheckedChange={(checked) =>
+                    toggleLanguage("javascript", !!checked)
+                  }
+                />
                 <Label htmlFor="lang-js" className="text-sm font-normal">
                   JavaScript
                 </Label>
               </div>
               <div className="flex items-center gap-2">
-                <Checkbox id="lang-py" />
+                <Checkbox
+                  id="lang-py"
+                  checked={languages.includes("python")}
+                  onCheckedChange={(checked) =>
+                    toggleLanguage("python", !!checked)
+                  }
+                />
                 <Label htmlFor="lang-py" className="text-sm font-normal">
                   Python
                 </Label>
@@ -193,7 +247,7 @@ export function RoomConfigForm() {
           {mode !== "2v2" && (
             <fieldset className="flex flex-col gap-2">
               <Label htmlFor="max-players">Max players</Label>
-              <Select defaultValue="4">
+              <Select value={maxPlayers} onValueChange={setMaxPlayers}>
                 <SelectTrigger id="max-players" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
@@ -216,17 +270,28 @@ export function RoomConfigForm() {
                 require an invite link.
               </p>
             </div>
-            <Switch id="visibility" />
+            <Switch
+              id="visibility"
+              checked={isPublic}
+              onCheckedChange={setIsPublic}
+            />
           </fieldset>
         </div>
       </section>
 
-      <Separator />
-
       {/* Submit */}
-      <Button type="submit" size="lg" className="w-full sm:w-auto sm:self-end">
-        Create Room
-        <ArrowRight data-icon="inline-end" />
+      <Button type="submit" size="lg" disabled={isLoading} className="w-full sm:w-auto sm:self-end">
+        {isLoading ? (
+          <>
+            <Loader2 className="animate-spin" />
+            Creating…
+          </>
+        ) : (
+          <>
+            Create Room
+            <ArrowRight data-icon="inline-end" />
+          </>
+        )}
       </Button>
     </form>
   )
