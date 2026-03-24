@@ -1,9 +1,40 @@
-import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
+import {
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+  ConnectedSocket,
+  MessageBody,
+} from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway()
+interface JoinRoomPayload {
+  roomId: string;
+  displayName: string;
+  avatar: string;
+}
+
+console.log(process.env.FE_URL);
+
+@WebSocketGateway({ cors: { origin: process.env.FE_URL } })
 export class RoomsGateway {
-  @SubscribeMessage('message')
-  handleMessage(client: any, payload: any): string {
-    return 'Hello world!';
+  @WebSocketServer()
+  server: Server;
+
+  @SubscribeMessage('join-room')
+  handleJoinRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: JoinRoomPayload,
+  ) {
+    const { roomId, displayName, avatar } = payload;
+
+    client.join(roomId);
+
+    client.to(roomId).emit('player-joined', {
+      id: client.id,
+      displayName,
+      avatar,
+    });
+
+    return { event: 'room-joined', data: { roomId } };
   }
 }

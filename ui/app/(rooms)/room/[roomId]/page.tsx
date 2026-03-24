@@ -1,3 +1,5 @@
+import { JoinRoomModal } from "./_components/join-room-modal"
+
 export default async function RoomPage({
   params,
 }: {
@@ -5,5 +7,10 @@ export default async function RoomPage({
 }) {
   const { roomId } = await params
 
-  return <div>Hello World — Room {roomId}</div>
+  return (
+    <div>
+      <JoinRoomModal roomId={roomId} />
+      Room {roomId}
+    </div>
+  )
 }
