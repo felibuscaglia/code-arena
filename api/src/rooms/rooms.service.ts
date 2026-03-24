@@ -9,8 +9,11 @@ export class RoomsService {
 
   create(dto: CreateRoomDto): string {
     const roomId = randomUUID();
-    const socketRoom = `room:${roomId}`;
-    this.rooms.set(roomId, { ...dto, socketRoom });
+    this.rooms.set(roomId, { ...dto, players: new Map() });
     return roomId;
+  }
+
+  findById(id: string): Room | undefined {
+    return this.rooms.get(id);
   }
 }

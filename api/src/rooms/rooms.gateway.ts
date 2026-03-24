@@ -13,8 +13,6 @@ interface JoinRoomPayload {
   avatar: string;
 }
 
-console.log(process.env.FE_URL);
-
 @WebSocketGateway({ cors: { origin: process.env.FE_URL } })
 export class RoomsGateway {
   @WebSocketServer()

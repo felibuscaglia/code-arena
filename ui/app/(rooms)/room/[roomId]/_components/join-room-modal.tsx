@@ -30,6 +30,7 @@ interface JoinRoomModalProps {
 export function JoinRoomModal({ roomId }: JoinRoomModalProps) {
   const [displayName, setDisplayName] = useState("")
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null)
+  const [open, setOpen] = useState(true)
 
   const canJoin = displayName.trim().length > 0 && selectedAvatar !== null
 
@@ -42,10 +43,12 @@ export function JoinRoomModal({ roomId }: JoinRoomModalProps) {
       displayName: displayName.trim(),
       avatar: selectedAvatar,
     })
+
+    setOpen(false)
   }
 
   return (
-    <Dialog open>
+    <Dialog open={open}>
       <DialogContent
         showCloseButton={false}
         onInteractOutside={(e) => e.preventDefault()}
@@ -89,7 +92,11 @@ export function JoinRoomModal({ roomId }: JoinRoomModalProps) {
                       : "border-border/50"
                   }`}
                 >
-                  <span className="text-2xl" role="img" aria-label={avatar.label}>
+                  <span
+                    className="text-2xl"
+                    role="img"
+                    aria-label={avatar.label}
+                  >
                     {avatar.emoji}
                   </span>
                   <span className="text-[10px] text-muted-foreground">
@@ -100,7 +107,12 @@ export function JoinRoomModal({ roomId }: JoinRoomModalProps) {
             </div>
           </fieldset>
 
-          <Button size="lg" disabled={!canJoin} onClick={handleJoin} className="w-full">
+          <Button
+            size="lg"
+            disabled={!canJoin}
+            onClick={handleJoin}
+            className="w-full"
+          >
             Join Room
             <ArrowRight data-icon="inline-end" />
           </Button>

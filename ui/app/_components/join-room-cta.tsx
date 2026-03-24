@@ -19,7 +19,6 @@ export function JoinRoomCTA() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!code.trim()) return
-    // TODO: Navigate to room with invite code
   }
 
   if (!isOpen) {
@@ -42,7 +41,7 @@ export function JoinRoomCTA() {
           value={code}
           onChange={(e) => setCode(e.target.value)}
           placeholder="Invite code or link"
-          className="h-8 w-48 pr-7 text-xs"
+          className="h-8 w-52 pr-7 text-xs"
         />
         <button
           type="button"

@@ -4,11 +4,14 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Logo } from "@/components/ui/logo"
+import { RoomError } from "@/lib/contexts/room/room-context"
 
-export default function RoomError() {
+export default function RoomErrorPage({ error }: { error: Error }) {
+  const isNotFound =
+    error instanceof RoomError && error.status === 404
+
   return (
-    <div className="relative flex min-h-svh flex-col items-center justify-center bg-grid px-6">
-      {/* Background glow */}
+    <div className="bg-grid relative flex min-h-svh flex-col items-center justify-center px-6">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2"
@@ -21,12 +24,12 @@ export default function RoomError() {
 
         <div className="flex flex-col gap-3">
           <h1 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
-            Unable to join room
+            {isNotFound ? "Room not found" : "Unable to join room"}
           </h1>
           <p className="text-muted-foreground">
-            This room may no longer be available, or something went wrong on our
-            end. If you received an invite link, reach out to the room creator to
-            get a new one.
+            {isNotFound
+              ? "This room is no longer available. It may have been closed or the link is invalid."
+              : "Something went wrong on our end. If you received an invite link, reach out to the room creator to get a new one."}
           </p>
         </div>
 
