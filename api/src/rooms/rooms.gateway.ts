@@ -6,6 +6,7 @@ import {
   MessageBody,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { RoomsService } from './rooms.service';
 
 interface JoinRoomPayload {
   roomId: string;
@@ -15,6 +16,8 @@ interface JoinRoomPayload {
 
 @WebSocketGateway({ cors: { origin: process.env.FE_URL } })
 export class RoomsGateway {
+  constructor(private readonly roomsService: RoomsService) {}
+
   @WebSocketServer()
   server: Server;
 
@@ -25,13 +28,11 @@ export class RoomsGateway {
   ) {
     const { roomId, displayName, avatar } = payload;
 
+    const player = this.roomsService.addPlayer(roomId, displayName, avatar);
+
     client.join(roomId);
 
-    client.to(roomId).emit('player-joined', {
-      id: client.id,
-      displayName,
-      avatar,
-    });
+    client.to(roomId).emit('player-joined', player);
 
     return { event: 'room-joined', data: { roomId } };
   }
