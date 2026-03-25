@@ -16,6 +16,7 @@ export class RoomError extends Error {
 
 export interface RoomContextValue {
   room: Room | null
+  player: Player | null
   isLoading: boolean
 }
 
@@ -29,6 +30,7 @@ export function RoomProvider({
   children: React.ReactNode
 }) {
   const [room, setRoom] = useState<Room | null>(null)
+  const [player, setPlayer] = useState<Player | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<RoomError | null>(null)
 
@@ -36,7 +38,7 @@ export function RoomProvider({
     rooms
       .getById(roomId)
       .then(({ data }) => {
-        setRoom({ ...data, players: new Map(Object.entries(data.players)) });
+        setRoom({ ...data, id: roomId, players: new Map(Object.entries(data.players)) });
         console.log({ data })
       },
       )
@@ -67,6 +69,7 @@ export function RoomProvider({
 
     function handleRoomJoined({ player }: { roomId: string; player: Player }) {
       addPlayer(player)
+      setPlayer(player)
     }
 
     socket.on("player-joined", handlePlayerJoined)
@@ -80,7 +83,7 @@ export function RoomProvider({
   if (error) throw error
 
   return (
-    <RoomContext.Provider value={{ room, isLoading }}>
+    <RoomContext.Provider value={{ room, player, isLoading }}>
       {children}
     </RoomContext.Provider>
   )

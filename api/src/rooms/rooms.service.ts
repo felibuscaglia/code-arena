@@ -9,14 +9,16 @@ import { RoomStatus } from './enums';
 export class RoomsService {
   private readonly rooms = new Map<string, Room>();
 
-  create(dto: CreateRoomDto): string {
+  create(dto: CreateRoomDto): { roomId: string; hostToken: string } {
     const roomId = randomUUID();
+    const hostToken = randomUUID();
     this.rooms.set(roomId, {
       ...dto,
       players: new Map(),
       status: RoomStatus.WAITING,
+      hostToken,
     });
-    return roomId;
+    return { roomId, hostToken };
   }
 
   findById(id: string): Room | undefined {
@@ -27,6 +29,7 @@ export class RoomsService {
     roomId: string,
     displayName: string,
     avatar: string,
+    hostToken?: string,
   ): Player | undefined {
     const room = this.rooms.get(roomId);
     if (!room) return undefined;
@@ -35,6 +38,7 @@ export class RoomsService {
       id: randomUUID(),
       displayName,
       avatar,
+      isHost: hostToken === room.hostToken,
     };
 
     room.players.set(player.id, player);

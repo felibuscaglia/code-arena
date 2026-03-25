@@ -54,6 +54,13 @@ lib/
 - WRONG: Defining the context, provider, and hook all in a single file.
 - WRONG: Placing context files inside `_components/` or `components/ui/`.
 
+### No Array Indexes as React Keys
+
+NEVER use array indexes as `key` props when rendering lists. Always use a stable, unique identifier from the data (e.g., `id`, `slug`, `name`). Index keys cause subtle bugs with component state, animations, and reordering.
+
+- WRONG: `items.map((item, i) => <Card key={i} ... />)`
+- RIGHT: `items.map((item) => <Card key={item.id} ... />)`
+
 ### Component File Organization
 
 - `components/ui/` is reserved exclusively for Shadcn UI primitives (installed via the shadcn CLI). Do NOT place custom feature components here and do NOT manually edit these files.

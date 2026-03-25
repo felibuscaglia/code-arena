@@ -8,8 +8,7 @@ export class RoomsController {
 
   @Post()
   create(@Body() dto: CreateRoomDto) {
-    const roomId = this.roomsService.create(dto);
-    return { roomId };
+    return this.roomsService.create(dto);
   }
 
   @Get(':roomId')

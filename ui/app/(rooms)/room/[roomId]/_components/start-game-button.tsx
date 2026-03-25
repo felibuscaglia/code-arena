@@ -9,7 +9,7 @@ interface StartGameButtonProps {
 
 export function StartGameButton({ roomId, disabled }: StartGameButtonProps) {
   function handleStart() {
-    socket.emit("start-game", { roomId })
+    socket.emit("start", { roomId })
   }
 
   return (

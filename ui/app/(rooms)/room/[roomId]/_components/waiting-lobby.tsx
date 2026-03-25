@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator"
 import { PlayerSlot } from "./player-slot"
 import { CopyRoomLinkButton } from "./copy-room-link-button"
 import { StartGameButton } from "./start-game-button"
+import { ChatPanel } from "./chat-panel"
 
 interface WaitingLobbyProps {
   roomId: string
@@ -55,6 +56,8 @@ export function WaitingLobby({ roomId }: WaitingLobbyProps) {
         </p>
         <CopyRoomLinkButton />
       </div>
+
+      <ChatPanel />
 
       <div className="flex flex-col items-center gap-2">
         <StartGameButton roomId={roomId} disabled={!hasEnoughPlayers} />

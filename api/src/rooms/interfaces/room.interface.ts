@@ -5,4 +5,5 @@ import { Player } from './player.interface';
 export interface Room extends CreateRoomDto {
   players: Map<string, Player>;
   status: RoomStatus;
+  hostToken: string;
 }

@@ -12,6 +12,7 @@ export interface CreateRoomPayload {
 export type RoomStatus = "waiting" | "in_progress" | "finished"
 
 export interface Room {
+  id: string
   name: string
   mode: "ffa" | "2v2"
   rounds: number
