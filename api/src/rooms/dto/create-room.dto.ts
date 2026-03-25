@@ -9,9 +9,7 @@ import {
   Min,
   Max,
   IsOptional,
-  ValidateIf,
 } from 'class-validator';
-import { RoomMode } from '../enums/room-mode.enum';
 import { RoomDifficulty } from '../enums/room-difficulty.enum';
 
 const ALLOWED_LANGUAGES = ['javascript', 'python'];
@@ -19,9 +17,6 @@ const ALLOWED_LANGUAGES = ['javascript', 'python'];
 export class CreateRoomDto {
   @IsString()
   name: string;
-
-  @IsEnum(RoomMode)
-  mode: RoomMode;
 
   @IsInt()
   @Min(1)
@@ -39,7 +34,6 @@ export class CreateRoomDto {
   @IsIn(ALLOWED_LANGUAGES, { each: true })
   languages: string[];
 
-  @ValidateIf((o) => o.mode === RoomMode.FFA)
   @IsInt()
   @Min(2)
   @Max(8)

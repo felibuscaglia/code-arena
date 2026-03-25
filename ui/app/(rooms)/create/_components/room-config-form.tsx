@@ -16,10 +16,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Switch } from "@/components/ui/switch"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { rooms } from "@/lib/api/services"
-
-type Mode = "ffa" | "2v2"
 
 const TIME_LIMITS = [
   { value: "5", label: "5 min" },
@@ -44,17 +41,16 @@ export function RoomConfigForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [name, setName] = useState("")
-  const [mode, setMode] = useState<Mode>("ffa")
   const [rounds, setRounds] = useState("3")
   const [roundTime, setRoundTime] = useState("10")
   const [difficulty, setDifficulty] = useState("medium")
   const [languages, setLanguages] = useState<string[]>(["javascript"])
   const [maxPlayers, setMaxPlayers] = useState("4")
-  const [isPublic, setIsPublic] = useState(false)
+  const [isPublic, setIsPublic] = useState(true)
 
   function toggleLanguage(lang: string, checked: boolean) {
     setLanguages((prev) =>
-      checked ? [...prev, lang] : prev.filter((l) => l !== lang),
+      checked ? [...prev, lang] : prev.filter((l) => l !== lang)
     )
   }
 
@@ -64,14 +60,13 @@ export function RoomConfigForm() {
     try {
       const { data } = await rooms.create({
         name,
-        mode,
         rounds: Number(rounds),
         roundTime: Number(roundTime),
         difficulty,
         languages,
-        ...(mode === "ffa" && { maxPlayers: Number(maxPlayers) }),
         public: isPublic,
       })
+      sessionStorage.setItem(`hostToken:${data.roomId}`, data.hostToken)
       router.push(`/room/${data.roomId}`)
     } catch {
       setIsLoading(false)
@@ -99,40 +94,6 @@ export function RoomConfigForm() {
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
-          </fieldset>
-
-          <fieldset className="flex flex-col gap-2 sm:col-span-2">
-            <Label>Mode</Label>
-            <ToggleGroup
-              type="single"
-              variant="outline"
-              value={mode}
-              onValueChange={(v) => {
-                if (v) setMode(v as Mode)
-              }}
-              className="w-full sm:w-fit"
-            >
-              <ToggleGroupItem value="ffa" className="flex-1 sm:flex-none sm:px-6">
-                Free for All
-              </ToggleGroupItem>
-              <ToggleGroupItem value="2v2" className="flex-1 sm:flex-none sm:px-6">
-                2v2 Teams
-              </ToggleGroupItem>
-            </ToggleGroup>
-            <p className="text-xs text-muted-foreground">
-              {mode === "ffa" &&
-                "Every coder for themselves. Top the leaderboard to win."}
-              {mode === "2v2" &&
-                "Team up with a partner. Shared editor and voice chat included."}
-            </p>
-            {mode === "2v2" && (
-              <div className="flex items-start gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5">
-                <Info className="mt-0.5 size-3.5 shrink-0 text-primary" />
-                <p className="text-xs text-primary/80">
-                  Each match is a head-to-head between two teams of two — four players total.
-                </p>
-              </div>
-            )}
           </fieldset>
         </div>
       </section>
@@ -181,7 +142,11 @@ export function RoomConfigForm() {
 
           <fieldset className="flex flex-col gap-3 sm:col-span-2">
             <Label>Difficulty</Label>
-            <RadioGroup value={difficulty} onValueChange={setDifficulty} className="flex gap-6">
+            <RadioGroup
+              value={difficulty}
+              onValueChange={setDifficulty}
+              className="flex gap-6"
+            >
               {DIFFICULTIES.map((d) => (
                 <div key={d.value} className="flex items-center gap-2">
                   <RadioGroupItem value={d.value} id={`diff-${d.value}`} />
@@ -244,23 +209,21 @@ export function RoomConfigForm() {
             </p>
           </fieldset>
 
-          {mode !== "2v2" && (
-            <fieldset className="flex flex-col gap-2">
-              <Label htmlFor="max-players">Max players</Label>
-              <Select value={maxPlayers} onValueChange={setMaxPlayers}>
-                <SelectTrigger id="max-players" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {MAX_PLAYERS.map((p) => (
-                    <SelectItem key={p} value={p}>
-                      {p} players
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </fieldset>
-          )}
+          <fieldset className="flex flex-col gap-2">
+            <Label htmlFor="max-players">Max players</Label>
+            <Select value={maxPlayers} onValueChange={setMaxPlayers}>
+              <SelectTrigger id="max-players" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {MAX_PLAYERS.map((p) => (
+                  <SelectItem key={p} value={p}>
+                    {p} players
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </fieldset>
 
           <fieldset className="flex items-center justify-between gap-4 sm:col-span-2">
             <div className="flex flex-col gap-1">
@@ -280,7 +243,12 @@ export function RoomConfigForm() {
       </section>
 
       {/* Submit */}
-      <Button type="submit" size="lg" disabled={isLoading} className="w-full sm:w-auto sm:self-end">
+      <Button
+        type="submit"
+        size="lg"
+        disabled={isLoading}
+        className="w-full sm:w-auto sm:self-end"
+      >
         {isLoading ? (
           <>
             <Loader2 className="animate-spin" />

@@ -12,7 +12,7 @@ interface WaitingLobbyProps {
 }
 
 export function WaitingLobby({ roomId }: WaitingLobbyProps) {
-  const { room } = useRoom()
+  const { room, player } = useRoom()
 
   if (!room) return null
 
@@ -59,14 +59,16 @@ export function WaitingLobby({ roomId }: WaitingLobbyProps) {
 
       <ChatPanel />
 
-      <div className="flex flex-col items-center gap-2">
-        <StartGameButton roomId={roomId} disabled={!hasEnoughPlayers} />
-        {!hasEnoughPlayers && (
-          <p className="text-xs text-muted-foreground">
-            At least 2 players needed to start
-          </p>
-        )}
-      </div>
+      {player?.isHost && (
+        <div className="flex flex-col items-center gap-2">
+          <StartGameButton roomId={roomId} disabled={!hasEnoughPlayers} />
+          {!hasEnoughPlayers && (
+            <p className="text-xs text-muted-foreground">
+              At least 2 players needed to start
+            </p>
+          )}
+        </div>
+      )}
     </div>
   )
 }

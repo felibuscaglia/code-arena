@@ -8,6 +8,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { RoomsService } from './rooms.service';
+import { HttpStatus } from '@nestjs/common';
 
 interface JoinRoomPayload {
   roomId: string;
@@ -64,5 +65,7 @@ export class RoomsGateway implements OnGatewayDisconnect {
       message: payload.message,
       timestamp: Date.now(),
     });
+
+    return HttpStatus.ACCEPTED;
   }
 }

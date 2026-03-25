@@ -1,6 +1,5 @@
 export interface CreateRoomPayload {
   name: string
-  mode: "ffa" | "2v2"
   rounds: number
   roundTime: number
   difficulty: string
@@ -14,7 +13,6 @@ export type RoomStatus = "waiting" | "in_progress" | "finished"
 export interface Room {
   id: string
   name: string
-  mode: "ffa" | "2v2"
   rounds: number
   roundTime: number
   difficulty: string
@@ -29,4 +27,5 @@ export interface Player {
   id: string
   displayName: string
   avatar: string
+  isHost: boolean
 }
