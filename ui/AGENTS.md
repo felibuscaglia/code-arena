@@ -61,6 +61,17 @@ NEVER use array indexes as `key` props when rendering lists. Always use a stable
 - WRONG: `items.map((item, i) => <Card key={i} ... />)`
 - RIGHT: `items.map((item) => <Card key={item.id} ... />)`
 
+### Helper Functions
+
+All helper functions (including formatters, parsers, validators, and other pure utilities) MUST be placed under `lib/helpers/` and grouped by functionality into dedicated files (e.g., `text.ts`, `date.ts`, `number.ts`). Do NOT scatter helpers inside component files, route folders, or `components/`.
+
+- Each file should group related helpers by domain (e.g., all text-related helpers in `text.ts`).
+- Import directly from the specific file (e.g., `import { truncate } from '@/lib/helpers/text'`). Do NOT create barrel `index.ts` files in `lib/helpers/`.
+
+- WRONG: Defining a `formatTime` function inside a component file.
+- WRONG: Creating `lib/helpers/index.ts` that re-exports everything.
+- RIGHT: Adding `formatTime` to `lib/helpers/time.ts` and importing it directly.
+
 ### Component File Organization
 
 - `components/ui/` is reserved exclusively for Shadcn UI primitives (installed via the shadcn CLI). Do NOT place custom feature components here and do NOT manually edit these files.

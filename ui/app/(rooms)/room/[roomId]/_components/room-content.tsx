@@ -3,6 +3,7 @@
 import { useRoom } from "@/lib/contexts/room"
 import { Skeleton } from "@/components/ui/skeleton"
 import { WaitingLobby } from "./waiting-lobby"
+import { ArenaView } from "./arena-view"
 
 interface RoomContentProps {
   roomId: string
@@ -46,7 +47,7 @@ export function RoomContent({ roomId }: RoomContentProps) {
     case "waiting":
       return <WaitingLobby roomId={roomId} />
     case "in_progress":
-      return null
+      return <ArenaView />
     case "finished":
       return null
   }
