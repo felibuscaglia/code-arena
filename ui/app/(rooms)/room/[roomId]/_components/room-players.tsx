@@ -16,8 +16,6 @@ export function RoomPlayers() {
   const { room } = useRoom()
   const players = room ? Array.from(room.players.values()) : []
 
-  console.log({ room, players });
-
   return (
     <AvatarGroup>
       {players.map((player) => (

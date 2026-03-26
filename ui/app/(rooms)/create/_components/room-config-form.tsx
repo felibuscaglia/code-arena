@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowRight, Info, Loader2 } from "lucide-react"
+import { ArrowRight, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,10 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Switch } from "@/components/ui/switch"
 import { rooms } from "@/lib/api/services"
+import { DifficultySelector } from "./difficulty-selector"
+import { LanguageSelector } from "./language-selector"
 
 const TIME_LIMITS = [
   { value: "5", label: "5 min" },
@@ -24,13 +24,6 @@ const TIME_LIMITS = [
   { value: "15", label: "15 min" },
   { value: "20", label: "20 min" },
   { value: "30", label: "30 min" },
-]
-
-const DIFFICULTIES = [
-  { value: "easy", label: "Easy" },
-  { value: "medium", label: "Medium" },
-  { value: "hard", label: "Hard" },
-  { value: "mixed", label: "Mixed" },
 ]
 
 const ROUNDS = Array.from({ length: 10 }, (_, i) => String(i + 1))
@@ -75,7 +68,7 @@ export function RoomConfigForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-10">
-      {/* ── Basics ── */}
+      {/* Basics */}
       <section className="flex flex-col gap-6 rounded-xl border border-border/40 bg-card/50 p-6">
         <div>
           <h2 className="font-heading text-sm font-semibold">Basics</h2>
@@ -84,21 +77,19 @@ export function RoomConfigForm() {
           </p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2">
-          <fieldset className="flex flex-col gap-2 sm:col-span-2">
-            <Label htmlFor="room-name">Room name</Label>
-            <Input
-              id="room-name"
-              placeholder="e.g. Friday Night Showdown"
-              className="h-9"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </fieldset>
-        </div>
+        <fieldset className="flex flex-col gap-2">
+          <Label htmlFor="room-name">Room name</Label>
+          <Input
+            id="room-name"
+            placeholder="e.g. Friday Night Showdown"
+            className="h-9"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </fieldset>
       </section>
 
-      {/* ── Match Settings ── */}
+      {/* Match Settings */}
       <section className="flex flex-col gap-6 rounded-xl border border-border/40 bg-card/50 p-6">
         <div>
           <h2 className="font-heading text-sm font-semibold">Match settings</h2>
@@ -140,33 +131,13 @@ export function RoomConfigForm() {
             </Select>
           </fieldset>
 
-          <fieldset className="flex flex-col gap-3 sm:col-span-2">
-            <Label>Difficulty</Label>
-            <RadioGroup
-              value={difficulty}
-              onValueChange={setDifficulty}
-              className="flex gap-6"
-            >
-              {DIFFICULTIES.map((d) => (
-                <div key={d.value} className="flex items-center gap-2">
-                  <RadioGroupItem value={d.value} id={`diff-${d.value}`} />
-                  <Label
-                    htmlFor={`diff-${d.value}`}
-                    className="text-sm font-normal"
-                  >
-                    {d.label}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-            <p className="text-xs text-muted-foreground">
-              Mixed picks a random difficulty each round.
-            </p>
-          </fieldset>
+          <div className="sm:col-span-2">
+            <DifficultySelector value={difficulty} onValueChange={setDifficulty} />
+          </div>
         </div>
       </section>
 
-      {/* ── Preferences ── */}
+      {/* Preferences */}
       <section className="flex flex-col gap-6 rounded-xl border border-border/40 bg-card/50 p-6">
         <div>
           <h2 className="font-heading text-sm font-semibold">Preferences</h2>
@@ -176,38 +147,9 @@ export function RoomConfigForm() {
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2">
-          <fieldset className="flex flex-col gap-3">
-            <Label>Languages</Label>
-            <div className="flex gap-6">
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="lang-js"
-                  checked={languages.includes("javascript")}
-                  onCheckedChange={(checked) =>
-                    toggleLanguage("javascript", !!checked)
-                  }
-                />
-                <Label htmlFor="lang-js" className="text-sm font-normal">
-                  JavaScript
-                </Label>
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="lang-py"
-                  checked={languages.includes("python")}
-                  onCheckedChange={(checked) =>
-                    toggleLanguage("python", !!checked)
-                  }
-                />
-                <Label htmlFor="lang-py" className="text-sm font-normal">
-                  Python
-                </Label>
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Languages available for solving challenges.
-            </p>
-          </fieldset>
+          <div className="sm:col-span-2">
+            <LanguageSelector value={languages} onToggle={toggleLanguage} />
+          </div>
 
           <fieldset className="flex flex-col gap-2">
             <Label htmlFor="max-players">Max players</Label>
@@ -247,12 +189,12 @@ export function RoomConfigForm() {
         type="submit"
         size="lg"
         disabled={isLoading}
-        className="w-full sm:w-auto sm:self-end"
+        className={`w-full sm:w-auto sm:self-end ${!isLoading ? "glow-primary" : ""}`}
       >
         {isLoading ? (
           <>
             <Loader2 className="animate-spin" />
-            Creating…
+            Creating...
           </>
         ) : (
           <>

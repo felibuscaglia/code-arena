@@ -1,16 +1,46 @@
 "use client"
 
 import { useRoom } from "@/lib/contexts/room"
+import { Skeleton } from "@/components/ui/skeleton"
 import { WaitingLobby } from "./waiting-lobby"
 
 interface RoomContentProps {
   roomId: string
 }
 
+function LobbySkeleton() {
+  return (
+    <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 flex-col p-6 lg:p-8">
+        <div className="mb-8 flex flex-col gap-3">
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-4 w-32" />
+        </div>
+        <Skeleton className="mb-4 h-3 w-28" />
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={`skel-slot-${i}`} className="h-28 rounded-lg" />
+          ))}
+        </div>
+      </div>
+      <div className="hidden w-80 border-l border-border/50 lg:block lg:w-96">
+        <div className="p-4">
+          <Skeleton className="mb-4 h-3 w-12" />
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={`skel-msg-${i}`} className="h-8 w-3/4" />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function RoomContent({ roomId }: RoomContentProps) {
   const { room, isLoading } = useRoom()
 
-  if (isLoading || !room) return null
+  if (isLoading || !room) return <LobbySkeleton />
 
   switch (room.status) {
     case "waiting":

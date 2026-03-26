@@ -12,10 +12,10 @@ export function CopyRoomLinkButton() {
   }
 
   return (
-    <Button variant="outline" size="sm" onClick={handleCopy}>
+    <Button variant="outline" onClick={handleCopy}>
       {copied ? (
         <>
-          <Check className="size-4" />
+          <Check className="size-4 text-success" />
           Copied!
         </>
       ) : (

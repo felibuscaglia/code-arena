@@ -12,9 +12,9 @@ export default async function RoomPage({
 
   return (
     <RoomProvider roomId={roomId}>
-      <div className="flex flex-col gap-6 p-6">
+      <div className="flex h-svh flex-col bg-grid">
         <JoinRoomModal roomId={roomId} />
-        <RoomInfoSummary />
+        <RoomInfoSummary roomId={roomId} />
         <RoomContent roomId={roomId} />
       </div>
     </RoomProvider>

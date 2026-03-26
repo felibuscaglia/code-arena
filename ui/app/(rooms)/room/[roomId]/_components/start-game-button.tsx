@@ -13,9 +13,14 @@ export function StartGameButton({ roomId, disabled }: StartGameButtonProps) {
   }
 
   return (
-    <Button size="lg" disabled={disabled} onClick={handleStart}>
+    <Button
+      size="lg"
+      disabled={disabled}
+      onClick={handleStart}
+      className={!disabled ? "glow-primary animate-pulse-glow" : ""}
+    >
       <Play className="size-4" />
-      Start Game
+      Start Battle
     </Button>
   )
 }

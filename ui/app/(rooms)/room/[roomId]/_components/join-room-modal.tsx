@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { ArrowRight } from "lucide-react"
 import { socket } from "@/lib/api/socket"
+import { useRoom } from "@/lib/contexts/room"
 import {
   Dialog,
   DialogContent,
@@ -21,6 +22,9 @@ const AVATARS = [
   { id: "wizard", emoji: "\u{1F9D9}", label: "Wizard" },
   { id: "astronaut", emoji: "\u{1F9D1}\u200D\u{1F680}", label: "Astronaut" },
   { id: "hacker", emoji: "\u{1F468}\u200D\u{1F4BB}", label: "Hacker" },
+  { id: "pirate", emoji: "\u{1F3F4}\u200D\u2620\uFE0F", label: "Pirate" },
+  { id: "dragon", emoji: "\u{1F432}", label: "Dragon" },
+  { id: "ghost", emoji: "\u{1F47B}", label: "Ghost" },
 ] as const
 
 interface JoinRoomModalProps {
@@ -28,11 +32,13 @@ interface JoinRoomModalProps {
 }
 
 export function JoinRoomModal({ roomId }: JoinRoomModalProps) {
+  const { room } = useRoom()
   const [displayName, setDisplayName] = useState("")
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null)
   const [open, setOpen] = useState(true)
 
   const canJoin = displayName.trim().length > 0 && selectedAvatar !== null
+  const selectedEmoji = AVATARS.find((a) => a.id === selectedAvatar)?.emoji
 
   function handleJoin() {
     if (!canJoin) return
@@ -62,14 +68,16 @@ export function JoinRoomModal({ roomId }: JoinRoomModalProps) {
         showCloseButton={false}
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
-        className="sm:max-w-md"
+        className="sm:max-w-lg"
       >
         <DialogHeader>
           <DialogTitle className="font-heading text-xl">
-            Welcome to the arena
+            Enter the Arena
           </DialogTitle>
           <DialogDescription>
-            Pick a name and avatar before joining the room.
+            {room?.name
+              ? `Joining "${room.name}". Pick a name and avatar.`
+              : "Pick a name and avatar before joining the room."}
           </DialogDescription>
         </DialogHeader>
 
@@ -89,26 +97,26 @@ export function JoinRoomModal({ roomId }: JoinRoomModalProps) {
 
           <fieldset className="flex flex-col gap-3">
             <Label>Choose your avatar</Label>
-            <div className="grid grid-cols-6 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {AVATARS.map((avatar) => (
                 <button
                   key={avatar.id}
                   type="button"
                   onClick={() => setSelectedAvatar(avatar.id)}
-                  className={`flex flex-col items-center gap-1.5 rounded-lg border p-2.5 transition-all hover:bg-accent/10 ${
+                  className={`flex flex-col items-center gap-1.5 rounded-lg border p-3 transition-all hover:bg-accent/10 ${
                     selectedAvatar === avatar.id
-                      ? "border-primary bg-primary/10 ring-2 ring-primary/30"
+                      ? "border-primary bg-primary/10 ring-2 ring-primary/30 scale-[1.02] glow-primary"
                       : "border-border/50"
                   }`}
                 >
                   <span
-                    className="text-2xl"
+                    className="text-3xl"
                     role="img"
                     aria-label={avatar.label}
                   >
                     {avatar.emoji}
                   </span>
-                  <span className="text-[10px] text-muted-foreground">
+                  <span className="text-[11px] text-muted-foreground">
                     {avatar.label}
                   </span>
                 </button>
@@ -120,9 +128,9 @@ export function JoinRoomModal({ roomId }: JoinRoomModalProps) {
             size="lg"
             disabled={!canJoin}
             onClick={handleJoin}
-            className="w-full"
+            className={`w-full ${canJoin ? "glow-primary" : ""}`}
           >
-            Join Room
+            Join Battle
             <ArrowRight data-icon="inline-end" />
           </Button>
         </div>

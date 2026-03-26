@@ -2,29 +2,34 @@ import type { Metadata } from "next"
 import {
   Zap,
   Trophy,
-  Users,
   Globe,
   Repeat,
   Link as LinkIcon,
   ArrowRight,
+  Check,
 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Logo, LogoIcon } from "@/components/ui/logo"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { JoinRoomCTA } from "./_components/join-room-cta"
+import { BattlePreview } from "./_components/battle-preview"
 
 export const metadata: Metadata = {
   title: "CodeArena — Real-Time Competitive Coding Battles",
   description:
-    "Race head-to-head in real-time coding challenges. Create a room, invite friends, and compete on correctness, performance, and code quality. Supports 1v1, 2v2 team mode with shared editor and voice chat, and public matchmaking.",
+    "Race head-to-head in real-time coding challenges. Create a room, invite friends, and compete on correctness, performance, and code quality.",
   keywords: [
     "competitive coding",
     "coding battles",
     "real-time coding",
     "code challenges",
     "programming competition",
-    "pair programming",
     "coding arena",
   ],
   openGraph: {
@@ -42,6 +47,7 @@ const features = [
     description:
       "Race head-to-head solving coding challenges. Watch opponents' progress live as every second counts.",
     tag: "Core",
+    color: "text-primary bg-primary/10",
   },
   {
     icon: Trophy,
@@ -49,13 +55,7 @@ const features = [
     description:
       "Scored on correctness, execution speed, and code quality. The best code wins — not just the fastest.",
     tag: "Scoring",
-  },
-  {
-    icon: Users,
-    title: "2v2 Team Mode",
-    description:
-      "Pair up with a friend. Collaborate in a shared editor with built-in voice chat to crush the competition.",
-    tag: "Multiplayer",
+    color: "text-success bg-success/10",
   },
   {
     icon: Globe,
@@ -63,6 +63,7 @@ const features = [
     description:
       "No friends online? Jump into public rooms and compete against coders from around the world.",
     tag: "Matchmaking",
+    color: "text-warning bg-warning/10",
   },
   {
     icon: Repeat,
@@ -70,6 +71,7 @@ const features = [
     description:
       "Battle across multiple rounds with escalating difficulty. Consistency crowns the true champion.",
     tag: "Competitive",
+    color: "text-danger bg-danger/10",
   },
   {
     icon: LinkIcon,
@@ -77,6 +79,7 @@ const features = [
     description:
       "Create a room and share a link. Your arena is one click away — no sign-up walls, no friction.",
     tag: "Access",
+    color: "text-primary bg-primary/10",
   },
 ]
 
@@ -101,6 +104,12 @@ const steps = [
   },
 ]
 
+const highlights = [
+  "No signup required",
+  "Real-time scoring",
+  "1–10 rounds",
+]
+
 export default function LandingPage() {
   return (
     <div className="flex min-h-svh flex-col bg-grid">
@@ -116,17 +125,23 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="relative flex flex-col items-center px-6 pt-14">
-        {/* Background glow */}
+        {/* Background glows */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2"
         >
           <div className="h-[500px] w-[800px] rounded-full bg-primary/5 blur-[120px]" />
         </div>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute top-1/3 left-2/3 -translate-x-1/2 -translate-y-1/2"
+        >
+          <div className="h-[300px] w-[400px] rounded-full bg-success/5 blur-[100px]" />
+        </div>
 
         <div className="relative mx-auto flex max-w-2xl flex-col items-center gap-8 pt-36 pb-16 text-center">
           <Badge variant="secondary" className="animate-fade-in-up gap-1.5 font-mono text-xs">
-            <span className="inline-block size-1.5 animate-pulse rounded-full bg-emerald-500" />
+            <span className="inline-block size-1.5 animate-pulse rounded-full bg-success" />
             Now in early access
           </Badge>
 
@@ -134,7 +149,7 @@ export default function LandingPage() {
             className="flex flex-col gap-4 animate-fade-in-up"
             style={{ animationDelay: "0.1s" }}
           >
-            <h1 className="font-heading text-4xl leading-[1.1] font-bold tracking-tight [word-spacing:-0.3em] sm:text-5xl md:text-6xl">
+            <h1 className="font-heading text-5xl leading-[1.05] font-bold tracking-tight [word-spacing:-0.3em] sm:text-6xl md:text-7xl">
               Code. <br />Compete.{" "}<br />
               <span className="text-primary">Conquer.</span>
             </h1>
@@ -150,7 +165,7 @@ export default function LandingPage() {
             className="flex flex-col items-center gap-4 animate-fade-in-up"
             style={{ animationDelay: "0.2s" }}
           >
-            <Button size="lg" asChild>
+            <Button size="lg" className="glow-primary" asChild>
               <Link href="/create">
                 Create Room
                 <ArrowRight data-icon="inline-end" />
@@ -159,9 +174,14 @@ export default function LandingPage() {
             <div className="flex items-center gap-3">
               <JoinRoomCTA />
               <span className="text-xs text-muted-foreground/40">or</span>
-              <Button variant="ghost" size="sm">
-                Browse Public Rooms
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="sm" disabled>
+                    Browse Public Rooms
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Coming soon</TooltipContent>
+              </Tooltip>
             </div>
           </div>
 
@@ -178,76 +198,23 @@ export default function LandingPage() {
           className="animate-fade-in-up relative mx-auto w-full max-w-md pb-24"
           style={{ animationDelay: "0.4s" }}
         >
-          <div className="overflow-hidden rounded-xl border border-border/50 bg-card/80 shadow-2xl shadow-primary/5 backdrop-blur-sm">
-            <div className="flex items-center gap-2 border-b border-border/50 bg-muted/30 px-4 py-2.5">
-              <div className="flex gap-1.5">
-                <div className="size-2 rounded-full bg-foreground/15" />
-                <div className="size-2 rounded-full bg-foreground/15" />
-                <div className="size-2 rounded-full bg-foreground/15" />
-              </div>
-              <span className="text-[10px] text-muted-foreground/50">
-                battle — round 1 of 3
-              </span>
-            </div>
-            <div className="space-y-3 p-4">
-              <div className="flex items-center gap-3">
-                <span className="size-1.5 rounded-full bg-emerald-500" />
-                <span className="w-16 text-[11px] text-muted-foreground">
-                  you
-                </span>
-                <div className="h-1 flex-1 overflow-hidden rounded-full bg-muted">
-                  <div className="h-full w-[72%] rounded-full bg-emerald-500/80" />
-                </div>
-                <span className="w-8 text-right text-[10px] tabular-nums text-emerald-500">
-                  72%
-                </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="size-1.5 rounded-full bg-primary" />
-                <span className="w-16 text-[11px] text-muted-foreground">
-                  rival
-                </span>
-                <div className="h-1 flex-1 overflow-hidden rounded-full bg-muted">
-                  <div className="h-full w-[48%] rounded-full bg-primary/80" />
-                </div>
-                <span className="w-8 text-right text-[10px] tabular-nums text-primary">
-                  48%
-                </span>
-              </div>
-            </div>
-            <div className="border-t border-border/30 bg-background/60 p-4">
-              <div className="mb-2 text-[10px] text-muted-foreground/40">
-                solution.js
-              </div>
-              <div className="space-y-0.5 font-mono text-[11px] leading-relaxed">
-                <div>
-                  <span className="text-primary">function</span>{" "}
-                  <span className="text-foreground/80">twoSum</span>
-                  <span className="text-muted-foreground">
-                    (nums, target) {"{"}
-                  </span>
-                </div>
-                <div className="pl-4">
-                  <span className="text-primary">const</span>{" "}
-                  <span className="text-foreground/80">seen</span>{" "}
-                  <span className="text-muted-foreground">= new Map();</span>
-                </div>
-                <div className="pl-4">
-                  <span className="text-primary">for</span>{" "}
-                  <span className="text-muted-foreground">
-                    (const [i, n] of nums.entries()) {"{"}
-                  </span>
-                </div>
-                <div className="flex items-center pl-8">
-                  <span className="text-primary">if</span>{" "}
-                  <span className="text-muted-foreground">
-                    (seen.has(target - n))
-                  </span>
-                  <span className="animate-blink ml-0.5 inline-block h-3.5 w-[5px] bg-primary/70" />
-                </div>
-              </div>
-            </div>
-          </div>
+          <BattlePreview />
+        </div>
+      </section>
+
+      {/* Highlights */}
+      <section className="border-t border-border/50 px-6 py-10">
+        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-3">
+          {highlights.map((text) => (
+            <Badge
+              key={text}
+              variant="secondary"
+              className="gap-1.5 px-3 py-1 text-xs font-normal"
+            >
+              <Check className="size-3 text-success" />
+              {text}
+            </Badge>
+          ))}
         </div>
       </section>
 
@@ -260,18 +227,48 @@ export default function LandingPage() {
             </h2>
             <p className="max-w-md text-muted-foreground">
               Everything you need to host and compete in real-time coding
-              battles, from solo duels to team showdowns.
+              battles.
             </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature) => (
+          {/* Featured pair */}
+          <div className="mb-4 grid gap-4 sm:grid-cols-2">
+            {features.slice(0, 2).map((feature) => (
               <div
                 key={feature.title}
                 className="group flex flex-col gap-3 rounded-xl border border-border/50 bg-card/50 p-6 transition-all hover:border-border hover:bg-muted/30 hover:shadow-lg hover:shadow-primary/5"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <div
+                    className={`flex size-10 items-center justify-center rounded-lg ${feature.color}`}
+                  >
+                    <feature.icon className="size-5" />
+                  </div>
+                  <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                    {feature.tag}
+                  </span>
+                </div>
+                <h3 className="font-heading text-base font-semibold">
+                  {feature.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Remaining three */}
+          <div className="grid gap-4 sm:grid-cols-3">
+            {features.slice(2).map((feature) => (
+              <div
+                key={feature.title}
+                className="group flex flex-col gap-3 rounded-xl border border-border/50 bg-card/50 p-6 transition-all hover:border-border hover:bg-muted/30 hover:shadow-lg hover:shadow-primary/5"
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`flex size-9 items-center justify-center rounded-lg ${feature.color}`}
+                  >
                     <feature.icon className="size-4" />
                   </div>
                   <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
@@ -305,9 +302,11 @@ export default function LandingPage() {
           <div className="grid gap-8 sm:grid-cols-3">
             {steps.map((step, i) => (
               <div key={step.number} className="relative flex flex-col gap-3">
-                <span className="font-heading text-4xl font-bold text-primary/20">
-                  {step.number}
-                </span>
+                <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
+                  <span className="font-heading text-sm font-bold text-primary">
+                    {step.number}
+                  </span>
+                </div>
                 <h3 className="font-heading text-sm font-semibold">
                   {step.title}
                 </h3>
@@ -317,32 +316,12 @@ export default function LandingPage() {
                 {i < steps.length - 1 && (
                   <div
                     aria-hidden="true"
-                    className="absolute top-5 left-full hidden w-8 border-t border-dashed border-border/50 sm:block lg:w-full lg:max-w-24"
+                    className="absolute top-5 left-full hidden w-8 border-t border-dashed border-primary/20 sm:block lg:w-full lg:max-w-24"
                   />
                 )}
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section className="border-t border-border/50 px-6 py-16">
-        <div className="mx-auto grid max-w-3xl grid-cols-3 gap-8 text-center">
-          {[
-            { value: "< 1s", label: "Room creation" },
-            { value: "3", label: "Scoring dimensions" },
-            { value: "Custom", label: "Rounds per match" },
-          ].map((stat) => (
-            <div key={stat.label} className="flex flex-col gap-1">
-              <span className="font-heading text-2xl font-bold text-primary sm:text-3xl">
-                {stat.value}
-              </span>
-              <span className="text-xs text-muted-foreground">
-                {stat.label}
-              </span>
-            </div>
-          ))}
         </div>
       </section>
 
@@ -357,15 +336,20 @@ export default function LandingPage() {
             Create a room and send the link. Your first battle starts now.
           </p>
           <div className="flex gap-3">
-            <Button size="lg" asChild>
+            <Button size="lg" className="glow-primary" asChild>
               <Link href="/create">
                 Create Room
                 <ArrowRight data-icon="inline-end" />
               </Link>
             </Button>
-            <Button variant="outline" size="lg">
-              Browse Public Rooms
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="lg" disabled>
+                  Browse Public Rooms
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Coming soon</TooltipContent>
+            </Tooltip>
           </div>
         </div>
       </section>

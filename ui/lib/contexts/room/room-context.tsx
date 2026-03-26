@@ -38,8 +38,7 @@ export function RoomProvider({
     rooms
       .getById(roomId)
       .then(({ data }) => {
-        setRoom({ ...data, id: roomId, players: new Map(Object.entries(data.players)) });
-        console.log({ data })
+        setRoom({ ...data, id: roomId, players: new Map(Object.entries(data.players)) })
       },
       )
       .catch((err) => {
