@@ -26,6 +26,7 @@ export class RoomsService {
       status: RoomStatus.WAITING,
       hostToken,
       challenges,
+      currentRound: 1
     });
     return { roomId, hostToken };
   }
@@ -61,6 +62,12 @@ export class RoomsService {
     if (!room) return false;
     this.playerRoomBySocketId.delete(playerId);
     return room.players.delete(playerId);
+  }
+
+  updateStatus(roomId: string, status: RoomStatus): void {
+    const room = this.rooms.get(roomId);
+    if (!room) return;
+    room.status = status;
   }
 
   findRoomByPlayerId(playerId: string): string | undefined {

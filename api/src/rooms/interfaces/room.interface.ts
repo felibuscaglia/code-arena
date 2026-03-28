@@ -7,4 +7,5 @@ export interface Room extends CreateRoomDto {
   status: RoomStatus;
   hostToken: string;
   challenges: string[];
+  currentRound: number;
 }

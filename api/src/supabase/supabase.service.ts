@@ -15,16 +15,35 @@ export class SupabaseService {
     );
   }
 
-  async rpc<FnName extends keyof Functions>(
-    fn: FnName,
-    args: Functions[FnName]['Args'],
-  ): Promise<Functions[FnName]['Returns']> {
-    const { data, error } = await this.client.rpc(fn as string, args as any);
+  async findOne<TableName extends keyof Database['public']['Tables']>(
+    table: TableName,
+    filters: Partial<Database['public']['Tables'][TableName]['Row']>,
+  ): Promise<Database['public']['Tables'][TableName]['Row'] | null> {
+    let query = this.client.from(table).select('*');
+
+    for (const [key, value] of Object.entries(filters)) {
+      query = query.eq(key as any, value);
+    }
+
+    const { data, error } = await query.maybeSingle();
 
     if (error) {
       throw error;
     }
 
-    return data as Functions[FnName]['Returns'];
+    return data as Database['public']['Tables'][TableName]['Row'] | null;
+  }
+
+  async rpc<FnName extends keyof Functions>(
+    fn: FnName,
+    args: Functions[FnName]['Args'],
+  ) {
+    const { data, error } = await this.client.rpc(fn, args);
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
   }
 }

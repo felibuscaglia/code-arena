@@ -8,6 +8,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { RoomsService } from './rooms.service';
+import { RoomStatus } from './enums';
 import { HttpStatus } from '@nestjs/common';
 
 interface JoinRoomPayload {
@@ -39,19 +40,41 @@ export class RoomsGateway implements OnGatewayDisconnect {
   ) {
     const { roomId, displayName, avatar, hostToken } = payload;
 
-    const player = this.roomsService.addPlayer(roomId, displayName, avatar, client.id, hostToken);
+    const player = this.roomsService.addPlayer(
+      roomId,
+      displayName,
+      avatar,
+      client.id,
+      hostToken,
+    );
 
     client.join(roomId);
 
-    
     client.to(roomId).emit('player-joined', player);
 
     const room = this.roomsService.findById(roomId);
-    if (room && room.maxPlayers && room.players.size >= room.maxPlayers) {
-      this.server.to(roomId).emit('start');
+
+    if (room?.maxPlayers && room?.players.size >= room.maxPlayers) {
+      this.server.to(roomId).emit('start-game');
     }
 
     return { event: 'room-joined', data: { roomId, player } };
+  }
+
+  @SubscribeMessage('start-game')
+  handleStartGame(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { roomId: string },
+  ) {
+    const { roomId } = payload;
+    const room = this.roomsService.findById(roomId);
+    if (!room) return;
+
+    this.roomsService.updateStatus(roomId, RoomStatus.IN_PROGRESS);
+    this.server.to(roomId).emit('start_round', {
+      round: room.currentRound,
+      challengeId: room.challenges[room.currentRound - 1],
+    });
   }
 
   @SubscribeMessage('send-message')

@@ -9,7 +9,7 @@ interface StartGameButtonProps {
 
 export function StartGameButton({ roomId, disabled }: StartGameButtonProps) {
   function handleStart() {
-    socket.emit("start", { roomId })
+    socket.emit("start-game", { roomId })
   }
 
   return (
@@ -20,7 +20,7 @@ export function StartGameButton({ roomId, disabled }: StartGameButtonProps) {
       className={!disabled ? "glow-primary animate-pulse-glow" : ""}
     >
       <Play className="size-4" />
-      Start Battle
+      Start Game
     </Button>
   )
 }
