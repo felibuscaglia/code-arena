@@ -2,7 +2,7 @@
 
 import { createContext, useEffect, useState } from "react"
 import { isAxiosError } from "axios"
-import { rooms, type Room, type Player } from "@/lib/api/services"
+import { rooms, type Room, type Player, type Challenge } from "@/lib/api/services"
 import { socket } from "@/lib/api/socket"
 
 export class RoomError extends Error {
@@ -17,6 +17,7 @@ export class RoomError extends Error {
 export interface RoomContextValue {
   room: Room | null
   player: Player | null
+  challenge: Challenge | null
   isLoading: boolean
 }
 
@@ -31,6 +32,7 @@ export function RoomProvider({
 }) {
   const [room, setRoom] = useState<Room | null>(null)
   const [player, setPlayer] = useState<Player | null>(null)
+  const [challenge, setChallenge] = useState<Challenge | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<RoomError | null>(null)
 
@@ -80,20 +82,31 @@ export function RoomProvider({
       })
     }
 
+    function handleStartRound({ round, challenge }: { round: number; challenge: Challenge }) {
+      setRoom((prev) => {
+        if (!prev) return prev
+        const status = prev.status === "in_progress" ? prev.status : "in_progress" as const
+        return { ...prev, status, currentRound: round }
+      })
+      setChallenge(challenge)
+    }
+
     socket.on("player-joined", handlePlayerJoined)
     socket.on("room-joined", handleRoomJoined)
     socket.on("player-left", handlePlayerLeft)
+    socket.on("start_round", handleStartRound)
     return () => {
       socket.off("player-joined", handlePlayerJoined)
       socket.off("room-joined", handleRoomJoined)
       socket.off("player-left", handlePlayerLeft)
+      socket.off("start_round", handleStartRound)
     }
   }, [])
 
   if (error) throw error
 
   return (
-    <RoomContext.Provider value={{ room, player, isLoading }}>
+    <RoomContext.Provider value={{ room, player, challenge, isLoading }}>
       {children}
     </RoomContext.Provider>
   )

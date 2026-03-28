@@ -18,6 +18,6 @@ export class ChallengesService {
   }
 
   getChallengeForRound(id: string) {
-    return this.challengesRepository.getById(id);
+    return this.challengesRepository.getById(id, true);
   }
 }

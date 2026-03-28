@@ -12,20 +12,7 @@ import {
   ResizablePanel,
   ResizableHandle,
 } from "@/components/ui/resizable"
-
-const DEFAULT_CODE: Record<string, string> = {
-  javascript: `/**
- * @param {number[]} nums
- * @param {number} target
- * @return {number[]}
- */
-function twoSum(nums, target) {
-  // Write your solution here
-}`,
-  python: `def two_sum(nums: list[int], target: int) -> list[int]:
-    # Write your solution here
-    pass`,
-}
+import { useRoom } from "@/lib/contexts/room"
 
 const LANGUAGE_MAP: Record<string, string> = {
   javascript: "javascript",
@@ -33,12 +20,14 @@ const LANGUAGE_MAP: Record<string, string> = {
 }
 
 export function CodeEditorPanel() {
+  const { challenge } = useRoom()
+  const starterCode = challenge?.starter_code ?? {}
   const [language, setLanguage] = useState("javascript")
-  const [code, setCode] = useState(DEFAULT_CODE.javascript)
+  const [code, setCode] = useState(starterCode["javascript"] ?? "")
 
   function handleLanguageChange(lang: string) {
     setLanguage(lang)
-    setCode(DEFAULT_CODE[lang] ?? "")
+    setCode(starterCode[lang] ?? "")
   }
 
   return (

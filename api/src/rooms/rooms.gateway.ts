@@ -8,6 +8,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { RoomsService } from './rooms.service';
+import { ChallengesService } from '../challenges/challenges.service';
 import { RoomStatus } from './enums';
 import { HttpStatus } from '@nestjs/common';
 
@@ -20,7 +21,10 @@ interface JoinRoomPayload {
 
 @WebSocketGateway({ cors: { origin: process.env.FE_URL } })
 export class RoomsGateway implements OnGatewayDisconnect {
-  constructor(private readonly roomsService: RoomsService) {}
+  constructor(
+    private readonly roomsService: RoomsService,
+    private readonly challengesService: ChallengesService,
+  ) {}
 
   @WebSocketServer()
   server: Server;
@@ -62,7 +66,7 @@ export class RoomsGateway implements OnGatewayDisconnect {
   }
 
   @SubscribeMessage('start-game')
-  handleStartGame(
+  async handleStartGame(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { roomId: string },
   ) {
@@ -70,10 +74,14 @@ export class RoomsGateway implements OnGatewayDisconnect {
     const room = this.roomsService.findById(roomId);
     if (!room) return;
 
+    const challengeId = room.challenges[room.currentRound - 1];
+    const challenge = await this.challengesService.getChallengeForRound(challengeId);
+    if (!challenge) return;
+
     this.roomsService.updateStatus(roomId, RoomStatus.IN_PROGRESS);
     this.server.to(roomId).emit('start_round', {
       round: room.currentRound,
-      challengeId: room.challenges[room.currentRound - 1],
+      challenge,
     });
   }
 

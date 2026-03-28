@@ -9,7 +9,7 @@ import {
   Max,
   IsOptional,
 } from 'class-validator';
-import { ChallengeDifficulty } from '../../supabase/types';
+import { type ChallengeDifficulty } from '../../supabase/types';
 import { Constants } from '../../supabase/types/database.types';
 
 const ALLOWED_LANGUAGES = ['javascript', 'python'];

@@ -18,8 +18,9 @@ export class SupabaseService {
   async findOne<TableName extends keyof Database['public']['Tables']>(
     table: TableName,
     filters: Partial<Database['public']['Tables'][TableName]['Row']>,
-  ): Promise<Database['public']['Tables'][TableName]['Row'] | null> {
-    let query = this.client.from(table).select('*');
+    select: string = '*',
+  ) {
+    let query = this.client.from(table).select(select);
 
     for (const [key, value] of Object.entries(filters)) {
       query = query.eq(key as any, value);
@@ -31,7 +32,7 @@ export class SupabaseService {
       throw error;
     }
 
-    return data as Database['public']['Tables'][TableName]['Row'] | null;
+    return data;
   }
 
   async rpc<FnName extends keyof Functions>(
