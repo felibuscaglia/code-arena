@@ -21,7 +21,7 @@ export class CreateRoomDto {
   @IsInt()
   @Min(1)
   @Max(10)
-  rounds: number;
+  roundCount: number;
 
   @IsIn([5, 10, 15, 20, 25, 30])
   roundTime: number;

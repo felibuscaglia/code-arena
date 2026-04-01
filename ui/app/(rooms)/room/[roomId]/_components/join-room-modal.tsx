@@ -86,7 +86,7 @@ export function JoinRoomModal({ roomId }: JoinRoomModalProps) {
             <Label htmlFor="display-name">Display name</Label>
             <Input
               id="display-name"
-              placeholder="e.g. ByteSlayer"
+              placeholder="e.g. Neo"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               maxLength={20}

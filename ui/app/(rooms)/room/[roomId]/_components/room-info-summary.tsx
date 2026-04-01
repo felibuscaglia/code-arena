@@ -44,8 +44,8 @@ export function RoomInfoSummary({ roomId }: RoomInfoSummaryProps) {
         <Badge variant="secondary" className="gap-1 text-xs font-normal">
           <RotateCw className="size-3" />
           {room.status === "waiting"
-            ? `${room.rounds} ${room.rounds === 1 ? "round" : "rounds"}`
-            : `Round ${room.currentRound}/${room.rounds}`}
+            ? `${room.roundCount} ${room.roundCount === 1 ? "round" : "rounds"}`
+            : `Round ${room.currentRound}/${room.roundCount}`}
         </Badge>
         <Badge variant="secondary" className="gap-1 text-xs font-normal">
           <Timer className="size-3" />

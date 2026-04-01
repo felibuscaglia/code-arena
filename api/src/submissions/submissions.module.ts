@@ -8,5 +8,6 @@ import { ChallengesModule } from '../challenges/challenges.module';
   imports: [Judge0Module, ChallengesModule],
   providers: [SubmissionsService],
   controllers: [SubmissionsController],
+  exports: [SubmissionsService],
 })
 export class SubmissionsModule {}

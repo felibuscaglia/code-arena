@@ -86,20 +86,37 @@ export function RoomProvider({
       setRoom((prev) => {
         if (!prev) return prev
         const status = prev.status === "in_progress" ? prev.status : "in_progress" as const
-        return { ...prev, status, currentRound: round }
+        const rounds = [...prev.rounds, { startedAt: Date.now(), submittedPlayerIds: [] }]
+        return { ...prev, status, currentRound: round, rounds }
       })
       setChallenge(challenge)
+    }
+
+    function handlePlayerSubmitted({ playerId }: { playerId: string }) {
+      setRoom((prev) => {
+        if (!prev) return prev
+        const rounds = [...prev.rounds]
+        const currentRound = rounds[prev.currentRound - 1]
+        if (!currentRound) return prev
+        rounds[prev.currentRound - 1] = {
+          ...currentRound,
+          submittedPlayerIds: [...currentRound.submittedPlayerIds, playerId],
+        }
+        return { ...prev, rounds }
+      })
     }
 
     socket.on("player-joined", handlePlayerJoined)
     socket.on("room-joined", handleRoomJoined)
     socket.on("player-left", handlePlayerLeft)
     socket.on("start_round", handleStartRound)
+    socket.on("player-submitted", handlePlayerSubmitted)
     return () => {
       socket.off("player-joined", handlePlayerJoined)
       socket.off("room-joined", handleRoomJoined)
       socket.off("player-left", handlePlayerLeft)
       socket.off("start_round", handleStartRound)
+      socket.off("player-submitted", handlePlayerSubmitted)
     }
   }, [])
 

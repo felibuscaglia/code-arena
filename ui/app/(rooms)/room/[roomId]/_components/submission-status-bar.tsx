@@ -1,11 +1,17 @@
+"use client"
+
 import { Users } from "lucide-react"
+import { useRoom } from "@/lib/contexts/room"
 
-interface SubmissionStatusBarProps {
-  submitted: number
-  total: number
-}
+export function SubmissionStatusBar() {
+  const { room } = useRoom()
 
-export function SubmissionStatusBar({ submitted, total }: SubmissionStatusBarProps) {
+  if (!room) return null
+
+  const currentRound = room.rounds[room.currentRound - 1]
+  const submitted = currentRound?.submittedPlayerIds.length ?? 0
+  const total = room.players.size
+
   return (
     <div className="flex items-center gap-2 text-xs text-muted-foreground">
       <Users className="size-3.5" />

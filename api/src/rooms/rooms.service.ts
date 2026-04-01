@@ -18,7 +18,7 @@ export class RoomsService {
     const hostToken = randomUUID();
     const challenges = await this.challengesService.getChallengesByDifficulty(
       dto.difficulty,
-      dto.rounds,
+      dto.roundCount,
     );
     this.rooms.set(roomId, {
       ...dto,
@@ -26,7 +26,8 @@ export class RoomsService {
       status: RoomStatus.WAITING,
       hostToken,
       challenges,
-      currentRound: 1
+      currentRound: 1,
+      rounds: [],
     });
     return { roomId, hostToken };
   }

@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { ChallengesService } from '../challenges/challenges.service';
 import { Judge0Service } from '../judge0/judge0.service';
-import { SubmissionResult, TestCases } from './interfaces';
+import { ScoreParams, SubmissionResult, TestCases } from './interfaces';
 import {
   buildJavascriptHarness,
   buildPythonHarness,
@@ -48,6 +48,9 @@ export class SubmissionsService {
       dto.language,
     );
 
+    const totalExecutionTime = parseFloat(judge0Response.time) || 0;
+    const totalMemoryUsage = judge0Response.memory || 0;
+
     if (judge0Response.stderr || judge0Response.compile_output) {
       return {
         testCases: cases.map((_, i) => ({
@@ -61,6 +64,8 @@ export class SubmissionsService {
             'Unknown error',
           logs: [],
         })),
+        totalExecutionTime,
+        totalMemoryUsage,
       };
     }
 
@@ -68,6 +73,46 @@ export class SubmissionsService {
 
     return {
       testCases: parsed.results ?? [],
+      totalExecutionTime,
+      totalMemoryUsage,
     };
+  }
+
+  calculateScore(params: ScoreParams): number {
+    const { result, code, roundStartedAt, submittedAt, roundTime } = params;
+    const totalCases = result.testCases.length;
+
+    if (totalCases === 0) return 0;
+
+    // 1. Test cases passed (40%)
+    const passed = result.testCases.filter((tc) => tc.passed).length;
+    const passRate = passed / totalCases;
+
+    // 2. Execution time (25%) — lower is better, capped at Judge0's 5s limit
+    const maxTime = 5;
+    const timeScore = Math.max(0, 1 - result.totalExecutionTime / maxTime);
+
+    // 3. Memory usage (15%) — lower is better, capped at Judge0's 128MB limit
+    const maxMemory = 128000;
+    const memoryScore = Math.max(0, 1 - result.totalMemoryUsage / maxMemory);
+
+    // 4. Submission speed (12%) — faster submission within the round earns more
+    const roundDuration = roundTime * 1000;
+    const elapsed = submittedAt - roundStartedAt;
+    const speedScore = Math.max(0, 1 - elapsed / roundDuration);
+
+    // 5. Code length (8%) — fewer chars after stripping whitespace/comments
+    const stripped = code.replace(/\/\/.*|\/\*[\s\S]*?\*\/|#.*/g, '').replace(/\s+/g, '');
+    const maxLength = 2000;
+    const lengthScore = Math.max(0, 1 - stripped.length / maxLength);
+
+    const score =
+      passRate * 40 +
+      timeScore * 25 +
+      memoryScore * 15 +
+      speedScore * 12 +
+      lengthScore * 8;
+
+    return Math.round(Math.max(0, Math.min(100, score)));
   }
 }

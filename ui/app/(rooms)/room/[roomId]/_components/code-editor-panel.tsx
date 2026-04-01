@@ -15,6 +15,7 @@ import {
 import { useRoom } from "@/lib/contexts/room"
 import { useParams } from "next/navigation"
 import { submissions, type TestCaseResult } from "@/lib/api/services"
+import { socket } from "@/lib/api/socket"
 
 const LANGUAGE_MAP: Record<string, string> = {
   javascript: "javascript",
@@ -28,6 +29,7 @@ export function CodeEditorPanel() {
   const [language, setLanguage] = useState("javascript")
   const [code, setCode] = useState(starterCode["javascript"] ?? "")
   const [isRunning, setIsRunning] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [testResults, setTestResults] = useState<TestCaseResult[] | null>(null)
 
   function handleLanguageChange(lang: string) {
@@ -49,6 +51,17 @@ export function CodeEditorPanel() {
     }
   }
 
+  function handleSubmit() {
+    if (!challenge || isSubmitting) return
+    setIsSubmitting(true)
+    socket.emit("submit-solution", {
+      roomId,
+      challengeId: challenge.id,
+      language,
+      code,
+    })
+  }
+
   return (
     <div className="flex h-full flex-col">
       {/* Toolbar */}
@@ -59,8 +72,8 @@ export function CodeEditorPanel() {
             {isRunning ? <Loader2 className="size-3.5 animate-spin" /> : <Play className="size-3.5" />}
             Run Tests
           </Button>
-          <Button size="sm">
-            <Send className="size-3.5" />
+          <Button size="sm" onClick={handleSubmit} disabled={isSubmitting || !challenge}>
+            {isSubmitting ? <Loader2 className="size-3.5 animate-spin" /> : <Send className="size-3.5" />}
             Submit
           </Button>
         </div>
@@ -100,7 +113,7 @@ export function CodeEditorPanel() {
 
       {/* Status bar */}
       <div className="border-t border-border/50 px-3 py-2">
-        <SubmissionStatusBar submitted={3} total={6} />
+        <SubmissionStatusBar />
       </div>
     </div>
   )

@@ -9,21 +9,18 @@ import {
 import { Server, Socket } from 'socket.io';
 import { RoomsService } from './rooms.service';
 import { ChallengesService } from '../challenges/challenges.service';
+import { SubmissionsService } from '../submissions/submissions.service';
 import { RoomStatus } from './enums';
 import { HttpStatus } from '@nestjs/common';
-
-interface JoinRoomPayload {
-  roomId: string;
-  displayName: string;
-  avatar: string;
-  hostToken?: string;
-}
+import { type JoinRoomPayload } from './interfaces';
+import { type CreateSubmissionDto } from '../submissions/dto/create-submission.dto';
 
 @WebSocketGateway({ cors: { origin: process.env.FE_URL } })
 export class RoomsGateway implements OnGatewayDisconnect {
   constructor(
     private readonly roomsService: RoomsService,
     private readonly challengesService: ChallengesService,
+    private readonly submissionsService: SubmissionsService,
   ) {}
 
   @WebSocketServer()
@@ -67,7 +64,6 @@ export class RoomsGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage('start-game')
   async handleStartGame(
-    @ConnectedSocket() client: Socket,
     @MessageBody() payload: { roomId: string },
   ) {
     const { roomId } = payload;
@@ -78,6 +74,7 @@ export class RoomsGateway implements OnGatewayDisconnect {
     const challenge = await this.challengesService.getChallengeForRound(challengeId);
     if (!challenge) return;
 
+    room.rounds.push({ startedAt: Date.now(), submittedPlayerIds: [] });
     this.roomsService.updateStatus(roomId, RoomStatus.IN_PROGRESS);
     this.server.to(roomId).emit('start_round', {
       round: room.currentRound,
@@ -98,5 +95,33 @@ export class RoomsGateway implements OnGatewayDisconnect {
     });
 
     return HttpStatus.ACCEPTED;
+  }
+
+  @SubscribeMessage('submit-solution')
+  async handleSubmitSolution(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: CreateSubmissionDto,
+  ) {
+    const room = this.roomsService.findById(payload.roomId);
+    if (!room) return;
+
+    const roundState = room.rounds[room.currentRound - 1];
+    roundState.submittedPlayerIds.push(client.id);
+
+    this.server
+      .to(payload.roomId)
+      .emit('player-submitted', { playerId: client.id });
+
+    const result = await this.submissionsService.submit(payload, 'submit');
+
+    const score = this.submissionsService.calculateScore({
+      result,
+      code: payload.code,
+      roundStartedAt: roundState.startedAt,
+      submittedAt: Date.now(),
+      roundTime: room.roundTime,
+    });
+
+    return { result, score };
   }
 }

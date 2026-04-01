@@ -1,6 +1,6 @@
 export interface CreateRoomPayload {
   name: string
-  rounds: number
+  roundCount: number
   roundTime: number
   difficulty: string
   languages: string[]
@@ -10,10 +10,15 @@ export interface CreateRoomPayload {
 
 export type RoomStatus = "waiting" | "in_progress" | "finished"
 
+export interface RoundState {
+  startedAt: number
+  submittedPlayerIds: string[]
+}
+
 export interface Room {
   id: string
   name: string
-  rounds: number
+  roundCount: number
   roundTime: number
   difficulty: string
   languages: string[]
@@ -22,6 +27,7 @@ export interface Room {
   players: Map<string, Player>
   status: RoomStatus
   currentRound: number
+  rounds: RoundState[]
 }
 
 export interface Player {

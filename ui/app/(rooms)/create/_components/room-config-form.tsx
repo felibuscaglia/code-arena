@@ -37,7 +37,7 @@ export function RoomConfigForm() {
     try {
       const { data } = await rooms.create({
         name,
-        rounds,
+        roundCount: rounds,
         roundTime,
         difficulty,
         languages,
@@ -62,7 +62,7 @@ export function RoomConfigForm() {
         </Label>
         <Input
           id="room-name"
-          placeholder="e.g. Friday Night Showdown"
+          placeholder="e.g. Two Devs One Challenge"
           className="h-10"
           value={name}
           onChange={(e) => setName(e.target.value)}
