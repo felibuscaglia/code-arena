@@ -109,13 +109,13 @@ export function RoomProvider({
     socket.on("player-joined", handlePlayerJoined)
     socket.on("room-joined", handleRoomJoined)
     socket.on("player-left", handlePlayerLeft)
-    socket.on("start_round", handleStartRound)
+    socket.on("start-round", handleStartRound)
     socket.on("player-submitted", handlePlayerSubmitted)
     return () => {
       socket.off("player-joined", handlePlayerJoined)
       socket.off("room-joined", handleRoomJoined)
       socket.off("player-left", handlePlayerLeft)
-      socket.off("start_round", handleStartRound)
+      socket.off("start-round", handleStartRound)
       socket.off("player-submitted", handlePlayerSubmitted)
     }
   }, [])

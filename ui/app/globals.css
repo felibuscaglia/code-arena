@@ -175,6 +175,14 @@
   50% { box-shadow: 0 0 35px oklch(0.457 0.24 277 / 25%); }
 }
 
+@keyframes check-circle {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes check-mark {
+  to { stroke-dashoffset: 0; }
+}
+
 @keyframes dot-pulse {
   0%, 80%, 100% { opacity: 0; }
   40% { opacity: 1; }

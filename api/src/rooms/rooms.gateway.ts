@@ -12,7 +12,7 @@ import { ChallengesService } from '../challenges/challenges.service';
 import { SubmissionsService } from '../submissions/submissions.service';
 import { RoomStatus } from './enums';
 import { HttpStatus } from '@nestjs/common';
-import { type JoinRoomPayload } from './interfaces';
+import { type JoinRoomPayload, type RoundState } from './interfaces';
 import { type CreateSubmissionDto } from '../submissions/dto/create-submission.dto';
 
 @WebSocketGateway({ cors: { origin: process.env.FE_URL } })
@@ -26,12 +26,30 @@ export class RoomsGateway implements OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket) {
     const roomId = this.roomsService.findRoomByPlayerId(client.id);
     if (!roomId) return;
 
+    const room = this.roomsService.findById(roomId);
     this.roomsService.removePlayer(roomId, client.id);
     this.server.to(roomId).emit('player-left', client.id);
+
+    if (!room || room.status !== RoomStatus.IN_PROGRESS) return;
+
+    if (room.players.size === 0) {
+      clearTimeout(room.nextRoundTimeout);
+      return;
+    }
+
+    const roundState = room.rounds[room.currentRound - 1];
+    if (!roundState) return;
+
+    const alreadySubmitted = roundState.submittedPlayerIds.includes(client.id);
+    if (alreadySubmitted) return;
+
+    if (roundState.submittedPlayerIds.length === room.players.size) {
+      await this.emitRoundEnded(roomId, roundState);
+    }
   }
 
   @SubscribeMessage('join-room')
@@ -74,9 +92,10 @@ export class RoomsGateway implements OnGatewayDisconnect {
     const challenge = await this.challengesService.getChallengeForRound(challengeId);
     if (!challenge) return;
 
-    room.rounds.push({ startedAt: Date.now(), submittedPlayerIds: [] });
     this.roomsService.updateStatus(roomId, RoomStatus.IN_PROGRESS);
-    this.server.to(roomId).emit('start_round', {
+    this.roomsService.startRound(roomId);
+
+    this.server.to(roomId).emit('start-round', {
       round: room.currentRound,
       challenge,
     });
@@ -108,20 +127,58 @@ export class RoomsGateway implements OnGatewayDisconnect {
     const roundState = room.rounds[room.currentRound - 1];
     roundState.submittedPlayerIds.push(client.id);
 
+    const allSubmitted =
+      roundState.submittedPlayerIds.length === room.players.size;
+
     this.server
       .to(payload.roomId)
       .emit('player-submitted', { playerId: client.id });
 
-    const result = await this.submissionsService.submit(payload, 'submit');
+    const scorePromise = this.submissionsService
+      .submit(payload, 'submit')
+      .then((result) => {
+        const score = this.submissionsService.calculateScore({
+          result,
+          code: payload.code,
+          roundStartedAt: roundState.startedAt,
+          submittedAt: Date.now(),
+          roundTime: room.roundTime,
+        });
+        return { result, score };
+      });
 
-    const score = this.submissionsService.calculateScore({
-      result,
-      code: payload.code,
-      roundStartedAt: roundState.startedAt,
-      submittedAt: Date.now(),
-      roundTime: room.roundTime,
-    });
+    roundState.scores.set(
+      client.id,
+      scorePromise.then(({ score }) => score),
+    );
 
-    return { result, score };
+    if (allSubmitted) {
+      this.emitRoundEnded(payload.roomId, roundState);
+    }
+
+    return HttpStatus.OK;
+  }
+
+  private async emitRoundEnded(roomId: string, roundState: RoundState) {
+    const room = this.roomsService.findById(roomId);
+    if (!room) return;
+
+    const playerIds = [...roundState.scores.keys()];
+    const resolvedScores = await Promise.all(roundState.scores.values());
+    const scores = Object.fromEntries(
+      playerIds.map((id, i) => [id, resolvedScores[i]]),
+    );
+    const winner = playerIds.reduce((a, b) =>
+      scores[a].total >= scores[b].total ? a : b,
+    );
+    this.server.to(roomId).emit('end-round', { scores, winner });
+
+    room.currentRound++;
+
+    if (room.currentRound > room.roundCount) return; // TODO: End game.
+
+    room.nextRoundTimeout = setTimeout(() => {
+      this.handleStartGame({ roomId });
+    }, 60_000);
   }
 }

@@ -10,4 +10,5 @@ export interface Room extends CreateRoomDto {
   challenges: string[];
   currentRound: number;
   rounds: RoundState[];
+  nextRoundTimeout?: ReturnType<typeof setTimeout>;
 }

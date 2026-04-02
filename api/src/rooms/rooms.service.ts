@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import { Server } from 'socket.io';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { Player } from './interfaces/player.interface';
 import { Room } from './interfaces/room.interface';
@@ -69,6 +70,15 @@ export class RoomsService {
     const room = this.rooms.get(roomId);
     if (!room) return;
     room.status = status;
+  }
+
+  startRound(
+    roomId: string,
+  ): void {
+    const room = this.rooms.get(roomId);
+    if (!room) return;
+
+    room.rounds.push({ startedAt: Date.now(), submittedPlayerIds: [], scores: new Map() });
   }
 
   findRoomByPlayerId(playerId: string): string | undefined {

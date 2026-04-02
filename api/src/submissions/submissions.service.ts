@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { ChallengesService } from '../challenges/challenges.service';
 import { Judge0Service } from '../judge0/judge0.service';
-import { ScoreParams, SubmissionResult, TestCases } from './interfaces';
+import { ScoreBreakdown, ScoreParams, SubmissionResult, TestCases } from './interfaces';
 import {
   buildJavascriptHarness,
   buildPythonHarness,
@@ -78,11 +78,13 @@ export class SubmissionsService {
     };
   }
 
-  calculateScore(params: ScoreParams): number {
+  calculateScore(params: ScoreParams): ScoreBreakdown {
     const { result, code, roundStartedAt, submittedAt, roundTime } = params;
     const totalCases = result.testCases.length;
 
-    if (totalCases === 0) return 0;
+    if (totalCases === 0) {
+      return { passRate: 0, timeScore: 0, memoryScore: 0, speedScore: 0, lengthScore: 0, total: 0 };
+    }
 
     // 1. Test cases passed (40%)
     const passed = result.testCases.filter((tc) => tc.passed).length;
@@ -106,13 +108,16 @@ export class SubmissionsService {
     const maxLength = 2000;
     const lengthScore = Math.max(0, 1 - stripped.length / maxLength);
 
-    const score =
-      passRate * 40 +
-      timeScore * 25 +
-      memoryScore * 15 +
-      speedScore * 12 +
-      lengthScore * 8;
+    const total = Math.round(
+      Math.max(0, Math.min(100,
+        passRate * 40 +
+        timeScore * 25 +
+        memoryScore * 15 +
+        speedScore * 12 +
+        lengthScore * 8,
+      )),
+    );
 
-    return Math.round(Math.max(0, Math.min(100, score)));
+    return { passRate, timeScore, memoryScore, speedScore, lengthScore, total };
   }
 }

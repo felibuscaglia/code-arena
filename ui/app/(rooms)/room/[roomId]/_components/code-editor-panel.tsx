@@ -12,6 +12,7 @@ import {
   ResizablePanel,
   ResizableHandle,
 } from "@/components/ui/resizable"
+import { SubmissionWaitingDialog } from "./submission-waiting-dialog"
 import { useRoom } from "@/lib/contexts/room"
 import { useParams } from "next/navigation"
 import { submissions, type TestCaseResult } from "@/lib/api/services"
@@ -115,6 +116,8 @@ export function CodeEditorPanel() {
       <div className="border-t border-border/50 px-3 py-2">
         <SubmissionStatusBar />
       </div>
+
+      <SubmissionWaitingDialog open={isSubmitting} />
     </div>
   )
 }
