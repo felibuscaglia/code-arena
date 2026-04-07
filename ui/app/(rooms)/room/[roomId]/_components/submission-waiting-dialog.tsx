@@ -11,22 +11,12 @@ import {
 import { Users, Timer } from "lucide-react"
 import { useRoom } from "@/lib/contexts/room"
 
-const WAITING_MESSAGES = [
-  "Sit tight, the results are brewing...",
-  "Your code is in the arena now!",
-  "Waiting for the other gladiators...",
-  "Fingers crossed, you nailed it!",
-  "The judges are deliberating...",
-  "Time to stretch while you wait!",
-]
-
 interface SubmissionWaitingDialogProps {
   open: boolean
 }
 
 export function SubmissionWaitingDialog({ open }: SubmissionWaitingDialogProps) {
   const { room } = useRoom()
-  const [messageIndex, setMessageIndex] = useState(0)
   const [remaining, setRemaining] = useState(0)
 
   const currentRound = room?.rounds[room.currentRound - 1]
@@ -47,16 +37,6 @@ export function SubmissionWaitingDialog({ open }: SubmissionWaitingDialogProps) 
     const interval = setInterval(tick, 1000)
     return () => clearInterval(interval)
   }, [open, currentRound, totalSeconds])
-
-  // Rotate waiting messages
-  useEffect(() => {
-    if (!open) return
-    setMessageIndex(Math.floor(Math.random() * WAITING_MESSAGES.length))
-    const interval = setInterval(() => {
-      setMessageIndex((prev) => (prev + 1) % WAITING_MESSAGES.length)
-    }, 4000)
-    return () => clearInterval(interval)
-  }, [open])
 
   const minutes = Math.floor(remaining / 60)
   const seconds = remaining % 60
@@ -146,14 +126,6 @@ export function SubmissionWaitingDialog({ open }: SubmissionWaitingDialogProps) 
               ))}
             </div>
           </div>
-
-          {/* Fun rotating message */}
-          <p
-            key={messageIndex}
-            className="animate-in fade-in slide-in-from-bottom-1 text-center text-sm text-muted-foreground italic duration-300"
-          >
-            {WAITING_MESSAGES[messageIndex]}
-          </p>
         </div>
       </DialogContent>
     </Dialog>

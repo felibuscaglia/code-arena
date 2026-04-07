@@ -78,7 +78,12 @@ export class RoomsService {
     const room = this.rooms.get(roomId);
     if (!room) return;
 
-    room.rounds.push({ startedAt: Date.now(), submittedPlayerIds: [], scores: new Map() });
+    room.rounds.push({
+      startedAt: Date.now(),
+      submittedPlayerIds: [],
+      scores: new Map(),
+      resolvedScores: new Map(),
+    });
   }
 
   findRoomByPlayerId(playerId: string): string | undefined {

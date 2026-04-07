@@ -38,6 +38,7 @@ export class RoomsGateway implements OnGatewayDisconnect {
 
     if (room.players.size === 0) {
       clearTimeout(room.nextRoundTimeout);
+      this.roomsService.updateStatus(roomId, RoomStatus.FINISHED);
       return;
     }
 
@@ -77,7 +78,14 @@ export class RoomsGateway implements OnGatewayDisconnect {
       this.server.to(roomId).emit('start-game');
     }
 
-    return { event: 'room-joined', data: { roomId, player } };
+    return {
+      event: 'room-joined',
+      data: {
+        roomId,
+        player,
+        players: room ? [...room.players.values()] : [player],
+      },
+    };
   }
 
   @SubscribeMessage('start-game')
@@ -165,6 +173,9 @@ export class RoomsGateway implements OnGatewayDisconnect {
 
     const playerIds = [...roundState.scores.keys()];
     const resolvedScores = await Promise.all(roundState.scores.values());
+    playerIds.forEach((id, i) => {
+      roundState.resolvedScores.set(id, resolvedScores[i]);
+    });
     const scores = Object.fromEntries(
       playerIds.map((id, i) => [id, resolvedScores[i]]),
     );
@@ -175,10 +186,33 @@ export class RoomsGateway implements OnGatewayDisconnect {
 
     room.currentRound++;
 
-    if (room.currentRound > room.roundCount) return; // TODO: End game.
+    if (room.currentRound > room.roundCount) {
+      this.emitGameEnded(roomId);
+    }
 
     room.nextRoundTimeout = setTimeout(() => {
       this.handleStartGame({ roomId });
     }, 60_000);
+  }
+
+  private emitGameEnded(roomId: string) {
+    const room = this.roomsService.findById(roomId);
+    if (!room) return;
+
+    const totals = new Map<string, number>();
+    for (const round of room.rounds) {
+      for (const [playerId, score] of round.resolvedScores) {
+        totals.set(playerId, (totals.get(playerId) ?? 0) + score.total);
+      }
+    }
+
+    const standings = [...totals.entries()]
+      .map(([playerId, total]) => ({ playerId, total }))
+      .sort((a, b) => b.total - a.total);
+
+    const winner = standings[0]?.playerId;
+
+    this.roomsService.updateStatus(roomId, RoomStatus.FINISHED);
+    this.server.to(roomId).emit('end-game', { standings, winner });
   }
 }

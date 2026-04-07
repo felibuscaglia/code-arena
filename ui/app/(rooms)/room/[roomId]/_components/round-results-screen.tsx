@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { useRoom } from "@/lib/contexts/room"
+import { CumulativeStandingsSidebar } from "./cumulative-standings-sidebar"
 import { RoundCountdownTimer } from "./round-countdown-timer"
 
 export function RoundResultsScreen() {
@@ -71,7 +72,8 @@ export function RoundResultsScreen() {
   const winner = ranked[0]
 
   return (
-    <div className="flex flex-1 flex-col items-center overflow-y-auto px-4 py-8">
+    <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 flex-col items-center overflow-y-auto px-4 py-8">
       {/* Winner highlight */}
       <div className="mb-8 flex animate-fade-in-up flex-col items-center gap-3">
         <div className="relative">
@@ -89,7 +91,7 @@ export function RoundResultsScreen() {
             Round {room.currentRound} Winner
           </span>
           <span className="font-mono text-2xl font-bold text-foreground tabular-nums">
-            {winner.score.total.toFixed(0)}
+            {(winner.score.total * 100).toFixed(1)}
             <span className="ml-1 text-sm font-normal text-muted-foreground">pts</span>
           </span>
         </div>
@@ -179,34 +181,34 @@ export function RoundResultsScreen() {
                   </TableCell>
                   <TableCell className="text-center">
                     <span className={`font-mono text-sm tabular-nums ${isFirst ? "text-amber-300" : "text-muted-foreground"}`}>
-                      {entry.score.passRate.toFixed(0)}
+                      {(entry.score.passRate * 100).toFixed(1)}
                     </span>
                   </TableCell>
                   <TableCell className="text-center">
                     <span className={`font-mono text-sm tabular-nums ${isFirst ? "text-amber-300" : "text-muted-foreground"}`}>
-                      {entry.score.timeScore.toFixed(0)}
+                      {(entry.score.timeScore * 100).toFixed(1)}
                     </span>
                   </TableCell>
                   <TableCell className="text-center">
                     <span className={`font-mono text-sm tabular-nums ${isFirst ? "text-amber-300" : "text-muted-foreground"}`}>
-                      {entry.score.speedScore.toFixed(0)}
+                      {(entry.score.speedScore * 100).toFixed(1)}
                     </span>
                   </TableCell>
                   <TableCell className="text-center">
                     <span className={`font-mono text-sm tabular-nums ${isFirst ? "text-amber-300" : "text-muted-foreground"}`}>
-                      {entry.score.memoryScore.toFixed(0)}
+                      {(entry.score.memoryScore * 100).toFixed(1)}
                     </span>
                   </TableCell>
                   <TableCell className="text-center">
                     <span className={`font-mono text-sm tabular-nums ${isFirst ? "text-amber-300" : "text-muted-foreground"}`}>
-                      {entry.score.lengthScore.toFixed(0)}
+                      {(entry.score.lengthScore * 100).toFixed(1)}
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
                     <span
                       className={`font-mono text-sm font-bold tabular-nums ${isFirst ? "text-amber-400" : "text-foreground"}`}
                     >
-                      {entry.score.total.toFixed(0)}
+                      {(entry.score.total * 100).toFixed(1)}
                     </span>
                   </TableCell>
                 </TableRow>
@@ -222,6 +224,8 @@ export function RoundResultsScreen() {
           <RoundCountdownTimer isHost={isHost} roomId={room.id} />
         </div>
       )}
+      </div>
+      <CumulativeStandingsSidebar />
     </div>
   )
 }

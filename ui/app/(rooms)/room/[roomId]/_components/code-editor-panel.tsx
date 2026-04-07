@@ -24,11 +24,12 @@ const LANGUAGE_MAP: Record<string, string> = {
 }
 
 export function CodeEditorPanel() {
-  const { challenge } = useRoom()
+  const { room, challenge } = useRoom()
   const { roomId } = useParams<{ roomId: string }>()
   const starterCode = challenge?.starter_code ?? {}
-  const [language, setLanguage] = useState("javascript")
-  const [code, setCode] = useState(starterCode["javascript"] ?? "")
+  const defaultLanguage = room?.languages[0] ?? "javascript"
+  const [language, setLanguage] = useState(defaultLanguage)
+  const [code, setCode] = useState(starterCode[defaultLanguage] ?? "")
   const [isRunning, setIsRunning] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [testResults, setTestResults] = useState<TestCaseResult[] | null>(null)
@@ -67,8 +68,8 @@ export function CodeEditorPanel() {
     <div className="flex h-full flex-col">
       {/* Toolbar */}
       <div className="flex items-center justify-between border-b border-border/50 px-3 py-2">
-        <ArenaLanguageSelector onLanguageChange={handleLanguageChange} />
-        <div className="flex items-center gap-2">
+        <ArenaLanguageSelector value={language} onLanguageChange={handleLanguageChange} />
+        <div className="flex items-center gap-2 ml-auto">
           <Button variant="outline" size="sm" onClick={handleRunTests} disabled={isRunning || !challenge}>
             {isRunning ? <Loader2 className="size-3.5 animate-spin" /> : <Play className="size-3.5" />}
             Run Tests

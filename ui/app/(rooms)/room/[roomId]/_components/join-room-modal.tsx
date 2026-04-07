@@ -55,10 +55,6 @@ export function JoinRoomModal({ roomId }: JoinRoomModalProps) {
       ...(hostToken && { hostToken }),
     })
 
-    if (hostToken) {
-      sessionStorage.removeItem(`hostToken:${roomId}`)
-    }
-
     setOpen(false)
   }
 

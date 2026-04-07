@@ -170,7 +170,7 @@ export default function LandingPage() {
               style={{ animationDelay: "0.2s" }}
             >
               <HeroActions />
-              <p className="mt-4 text-xs text-muted-foreground/60">
+              <p className="my-4 text-xs text-muted-foreground/60">
                 Free to play — no account required
               </p>
             </div>

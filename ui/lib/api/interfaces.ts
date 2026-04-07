@@ -89,6 +89,16 @@ export interface RoundResult {
   winner: string
 }
 
+export interface GameStanding {
+  playerId: string
+  total: number
+}
+
+export interface GameResult {
+  standings: GameStanding[]
+  winner: string
+}
+
 export interface Challenge {
   id: string
   title: string

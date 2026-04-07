@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { WaitingLobby } from "./waiting-lobby"
 import { ArenaView } from "./arena-view"
 import { RoundResultsScreen } from "./round-results-screen"
+import { FinalResultsScreen } from "./final-results-screen"
 
 interface RoomContentProps {
   roomId: string
@@ -40,9 +41,11 @@ function LobbySkeleton() {
 }
 
 export function RoomContent({ roomId }: RoomContentProps) {
-  const { room, roundResult, isLoading } = useRoom()
+  const { room, roundResult, gameResult, isLoading } = useRoom()
 
   if (isLoading || !room) return <LobbySkeleton />
+
+  if (gameResult) return <FinalResultsScreen />
 
   if (roundResult) return <RoundResultsScreen />
 
@@ -52,6 +55,6 @@ export function RoomContent({ roomId }: RoomContentProps) {
     case "in_progress":
       return <ArenaView />
     case "finished":
-      return null
+      return <FinalResultsScreen />
   }
 }

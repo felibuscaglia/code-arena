@@ -108,14 +108,16 @@ export class SubmissionsService {
     const maxLength = 2000;
     const lengthScore = Math.max(0, 1 - stripped.length / maxLength);
 
-    const total = Math.round(
-      Math.max(0, Math.min(100,
-        passRate * 40 +
-        timeScore * 25 +
-        memoryScore * 15 +
-        speedScore * 12 +
-        lengthScore * 8,
-      )),
+    const total = Math.max(
+      0,
+      Math.min(
+        1,
+        passRate * 0.4 +
+          timeScore * 0.25 +
+          memoryScore * 0.15 +
+          speedScore * 0.12 +
+          lengthScore * 0.08,
+      ),
     );
 
     return { passRate, timeScore, memoryScore, speedScore, lengthScore, total };

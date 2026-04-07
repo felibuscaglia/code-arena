@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import {
   Select,
   SelectContent,
@@ -8,33 +7,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useRoom } from "@/lib/contexts/room"
 
-const LANGUAGES = [
-  { value: "javascript", label: "JavaScript" },
-  { value: "python", label: "Python" },
-]
-
-interface ArenaLanguageSelectorProps {
-  onLanguageChange?: (language: string) => void
+const LANGUAGE_LABELS: Record<string, string> = {
+  javascript: "JavaScript",
+  python: "Python",
 }
 
-export function ArenaLanguageSelector({ onLanguageChange }: ArenaLanguageSelectorProps) {
-  const [language, setLanguage] = useState("javascript")
+interface ArenaLanguageSelectorProps {
+  value: string
+  onLanguageChange: (language: string) => void
+}
 
-  function handleChange(value: string) {
-    setLanguage(value)
-    onLanguageChange?.(value)
-  }
+export function ArenaLanguageSelector({ value, onLanguageChange }: ArenaLanguageSelectorProps) {
+  const { room } = useRoom()
+  const languages = room?.languages ?? []
+
+  if (languages.length < 2) return null; 
 
   return (
-    <Select value={language} onValueChange={handleChange}>
+    <Select value={value} onValueChange={onLanguageChange}>
       <SelectTrigger size="sm" className="w-[130px] text-xs">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        {LANGUAGES.map((lang) => (
-          <SelectItem key={lang.value} value={lang.value}>
-            {lang.label}
+        {languages.map((lang) => (
+          <SelectItem key={lang} value={lang}>
+            {LANGUAGE_LABELS[lang] ?? lang}
           </SelectItem>
         ))}
       </SelectContent>

@@ -2,7 +2,7 @@
 
 import { createContext, useEffect, useState } from "react"
 import { isAxiosError } from "axios"
-import { rooms, type Room, type Player, type Challenge, type RoundResult } from "@/lib/api/services"
+import { rooms, type Room, type Player, type Challenge, type RoundResult, type GameResult } from "@/lib/api/services"
 import { socket } from "@/lib/api/socket"
 
 export class RoomError extends Error {
@@ -19,6 +19,8 @@ export interface RoomContextValue {
   player: Player | null
   challenge: Challenge | null
   roundResult: RoundResult | null
+  roundHistory: RoundResult[]
+  gameResult: GameResult | null
   isLoading: boolean
 }
 
@@ -35,6 +37,8 @@ export function RoomProvider({
   const [player, setPlayer] = useState<Player | null>(null)
   const [challenge, setChallenge] = useState<Challenge | null>(null)
   const [roundResult, setRoundResult] = useState<RoundResult | null>(null)
+  const [roundHistory, setRoundHistory] = useState<RoundResult[]>([])
+  const [gameResult, setGameResult] = useState<GameResult | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<RoomError | null>(null)
 
@@ -70,8 +74,21 @@ export function RoomProvider({
       addPlayer(player)
     }
 
-    function handleRoomJoined({ player }: { roomId: string; player: Player }) {
-      addPlayer(player)
+    function handleRoomJoined({
+      player,
+      players,
+    }: {
+      roomId: string
+      player: Player
+      players: Player[]
+    }) {
+      setRoom((prev) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          players: new Map(players.map((p) => [p.id, p])),
+        }
+      })
       setPlayer(player)
     }
 
@@ -97,6 +114,12 @@ export function RoomProvider({
 
     function handleEndRound(result: RoundResult) {
       setRoundResult(result)
+      setRoundHistory((prev) => [...prev, result])
+    }
+
+    function handleEndGame(result: GameResult) {
+      setGameResult(result)
+      setRoom((prev) => (prev ? { ...prev, status: "finished" as const } : prev))
     }
 
     function handlePlayerSubmitted({ playerId }: { playerId: string }) {
@@ -119,6 +142,7 @@ export function RoomProvider({
     socket.on("start-round", handleStartRound)
     socket.on("player-submitted", handlePlayerSubmitted)
     socket.on("end-round", handleEndRound)
+    socket.on("end-game", handleEndGame)
     return () => {
       socket.off("player-joined", handlePlayerJoined)
       socket.off("room-joined", handleRoomJoined)
@@ -126,13 +150,14 @@ export function RoomProvider({
       socket.off("start-round", handleStartRound)
       socket.off("player-submitted", handlePlayerSubmitted)
       socket.off("end-round", handleEndRound)
+      socket.off("end-game", handleEndGame)
     }
   }, [])
 
   if (error) throw error
 
   return (
-    <RoomContext.Provider value={{ room, player, challenge, roundResult, isLoading }}>
+    <RoomContext.Provider value={{ room, player, challenge, roundResult, roundHistory, gameResult, isLoading }}>
       {children}
     </RoomContext.Provider>
   )

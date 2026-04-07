@@ -155,9 +155,13 @@ export function RoomConfigForm() {
                 : "border-border/50 bg-muted/30 hover:border-border hover:bg-muted/50"
             }`}
           >
-            <Globe className={`size-4 shrink-0 ${isPublic ? "text-primary" : "text-muted-foreground"}`} />
+            <Globe
+              className={`size-4 shrink-0 ${isPublic ? "text-primary" : "text-muted-foreground"}`}
+            />
             <div>
-              <div className={`text-sm font-medium ${isPublic ? "text-foreground" : "text-muted-foreground"}`}>
+              <div
+                className={`text-sm font-medium ${isPublic ? "text-foreground" : "text-muted-foreground"}`}
+              >
                 Public
               </div>
               <div className="text-[11px] text-muted-foreground">
@@ -174,9 +178,13 @@ export function RoomConfigForm() {
                 : "border-border/50 bg-muted/30 hover:border-border hover:bg-muted/50"
             }`}
           >
-            <Lock className={`size-4 shrink-0 ${!isPublic ? "text-primary" : "text-muted-foreground"}`} />
+            <Lock
+              className={`size-4 shrink-0 ${!isPublic ? "text-primary" : "text-muted-foreground"}`}
+            />
             <div>
-              <div className={`text-sm font-medium ${!isPublic ? "text-foreground" : "text-muted-foreground"}`}>
+              <div
+                className={`text-sm font-medium ${!isPublic ? "text-foreground" : "text-muted-foreground"}`}
+              >
                 Private
               </div>
               <div className="text-[11px] text-muted-foreground">
