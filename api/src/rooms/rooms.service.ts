@@ -36,6 +36,17 @@ export class RoomsService {
     return this.rooms.get(id);
   }
 
+  findPublicWaiting(): (Room & { id: string })[] {
+    // Eventually, this logic needs to be reworked. Should work well with up to ~10,000 rooms.
+    const result: (Room & { id: string })[] = [];
+    for (const [id, room] of this.rooms) {
+      if (room.public && room.status === RoomStatus.WAITING) {
+        result.push({ ...room, id });
+      }
+    }
+    return result;
+  }
+
   addPlayer(
     roomId: string,
     displayName: string,

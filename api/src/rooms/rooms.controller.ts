@@ -11,6 +11,23 @@ export class RoomsController {
     return this.roomsService.create(dto);
   }
 
+  @Get()
+  list() {
+    return this.roomsService.findPublicWaiting().map((room) => {
+      const {
+        hostToken: _hostToken,
+        challenges: _challenges,
+        nextRoundTimeout: _nextRoundTimeout,
+        rounds: _rounds,
+        ...rest
+      } = room;
+      return {
+        ...rest,
+        players: Object.fromEntries(room.players),
+      };
+    });
+  }
+
   @Get(':roomId')
   getById(@Param('roomId') roomId: string) {
     const room = this.roomsService.findById(roomId);

@@ -224,3 +224,7 @@
 .dark .bg-grid {
   background-image: radial-gradient(circle, oklch(0.705 0.015 286.067 / 7%) 1px, transparent 1px);
 }
+
+button {
+  cursor: pointer;
+}

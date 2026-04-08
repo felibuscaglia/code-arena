@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowLeft, AlertCircle } from "lucide-react"
+import { ArrowLeft, AlertCircle, Globe } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { LogoIcon } from "@/components/ui/logo"
 import { RoomError } from "@/lib/contexts/room/room-context"
@@ -40,12 +40,20 @@ export default function RoomErrorPage({ error }: { error: Error }) {
           <p className="text-sm text-muted-foreground">{description}</p>
         </div>
 
-        <Button variant="outline" asChild>
-          <Link href="/">
-            <ArrowLeft data-icon="inline-start" />
-            Back to home
-          </Link>
-        </Button>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Button variant="outline" asChild>
+            <Link href="/">
+              <ArrowLeft data-icon="inline-start" />
+              Back to home
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href="/browse">
+              <Globe data-icon="inline-start" />
+              Browse rooms
+            </Link>
+          </Button>
+        </div>
       </div>
     </div>
   )

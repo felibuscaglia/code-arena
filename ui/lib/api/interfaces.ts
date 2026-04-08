@@ -30,6 +30,20 @@ export interface Room {
   rounds: RoundState[]
 }
 
+export interface RoomListItem {
+  id: string
+  name: string
+  roundCount: number
+  roundTime: number
+  difficulty: string
+  languages: string[]
+  maxPlayers: number
+  public: boolean
+  status: RoomStatus
+  currentRound: number
+  players: Record<string, Player>
+}
+
 export interface Player {
   id: string
   displayName: string

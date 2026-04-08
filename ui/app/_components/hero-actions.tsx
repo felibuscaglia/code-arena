@@ -1,19 +1,18 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { ArrowRight, Plus, Users, Globe, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 import Link from "next/link"
+import { parseRoomIdFromInput } from "@/lib/helpers/room"
 
 export function HeroActions() {
+  const router = useRouter()
   const [joinOpen, setJoinOpen] = useState(false)
   const [code, setCode] = useState("")
+  const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -24,7 +23,18 @@ export function HeroActions() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!code.trim()) return
+    const roomId = parseRoomIdFromInput(code)
+    if (!roomId) {
+      setError("Please paste a valid room link.")
+      return
+    }
+    router.push(`/room/${roomId}`)
+  }
+
+  function closeJoin() {
+    setJoinOpen(false)
+    setCode("")
+    setError(null)
   }
 
   return (
@@ -37,9 +47,8 @@ export function HeroActions() {
         </Link>
       </Button>
 
-      <div className="flex gap-3">
-        {/* Join action */}
-        {!joinOpen ? (
+      {!joinOpen ? (
+        <div className="flex gap-3">
           <Button
             variant="outline"
             size="lg"
@@ -49,25 +58,36 @@ export function HeroActions() {
             <Users className="size-4" />
             Join Room
           </Button>
-        ) : (
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-1 overflow-hidden rounded-lg border border-border bg-background"
+
+          <Button
+            variant="outline"
+            size="lg"
+            className="h-12 flex-1 text-sm"
+            asChild
           >
+            <Link href="/browse">
+              <Globe className="size-4" />
+              Browse Rooms
+            </Link>
+          </Button>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="flex flex-col gap-1.5">
+          <div className="flex w-full overflow-hidden rounded-lg border border-border bg-background">
             <div className="relative flex-1">
               <Input
                 ref={inputRef}
                 value={code}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder="Paste invite code or link"
-                className="h-12 rounded-none border-0 px-4 text-sm shadow-none focus-visible:ring-0"
+                onChange={(e) => {
+                  setCode(e.target.value)
+                  if (error) setError(null)
+                }}
+                placeholder="Paste room link"
+                className="h-12 rounded-none border-0 px-4 pr-9 text-sm shadow-none focus-visible:ring-0"
               />
               <button
                 type="button"
-                onClick={() => {
-                  setJoinOpen(false)
-                  setCode("")
-                }}
+                onClick={closeJoin}
                 className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 aria-label="Cancel"
               >
@@ -83,25 +103,14 @@ export function HeroActions() {
               Join
               <ArrowRight data-icon="inline-end" />
             </Button>
-          </form>
-        )}
-
-        {/* Browse action */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              size="lg"
-              className="h-12 flex-1 text-sm"
-              disabled
-            >
-              <Globe className="size-4" />
-              Browse Rooms
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Coming soon</TooltipContent>
-        </Tooltip>
-      </div>
+          </div>
+          {error && (
+            <p className="px-1 text-xs text-danger" role="alert">
+              {error}
+            </p>
+          )}
+        </form>
+      )}
     </div>
   )
 }

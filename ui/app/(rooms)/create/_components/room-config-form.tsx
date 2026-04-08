@@ -150,7 +150,7 @@ export function RoomConfigForm() {
           <button
             type="button"
             onClick={() => setIsPublic(true)}
-            className={`flex flex-1 items-center gap-3 rounded-lg border px-4 py-3 text-left transition-all ${
+            className={`flex flex-1 items-center gap-3 rounded-lg border px-4 py-3 text-left transition-all cursor-pointer ${
               isPublic
                 ? "border-primary/50 bg-primary/10 ring-2 ring-primary/20"
                 : "border-border/50 bg-muted/30 hover:border-border hover:bg-muted/50"
@@ -166,14 +166,14 @@ export function RoomConfigForm() {
                 Public
               </div>
               <div className="text-[11px] text-muted-foreground">
-                Anyone can find and join
+                Listed in Browse Rooms
               </div>
             </div>
           </button>
           <button
             type="button"
             onClick={() => setIsPublic(false)}
-            className={`flex flex-1 items-center gap-3 rounded-lg border px-4 py-3 text-left transition-all ${
+            className={`flex flex-1 items-center gap-3 rounded-lg border px-4 py-3 text-left transition-all cursor-pointer ${
               !isPublic
                 ? "border-primary/50 bg-primary/10 ring-2 ring-primary/20"
                 : "border-border/50 bg-muted/30 hover:border-border hover:bg-muted/50"
@@ -189,7 +189,7 @@ export function RoomConfigForm() {
                 Private
               </div>
               <div className="text-[11px] text-muted-foreground">
-                Invite link required
+                Hidden — joinable by link only
               </div>
             </div>
           </button>

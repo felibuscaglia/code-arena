@@ -1,11 +1,12 @@
 import { api } from "./client"
-import type { CreateRoomPayload, CreateSubmissionPayload, Room, SubmissionResult } from "./interfaces"
+import type { CreateRoomPayload, CreateSubmissionPayload, Room, RoomListItem, SubmissionResult } from "./interfaces"
 
-export type { CreateRoomPayload, CreateSubmissionPayload, Room, RoomStatus, RoundState, Player, Challenge, Example, TestCaseResult, SubmissionResult, ScoreBreakdown, RoundResult, GameResult, GameStanding } from "./interfaces"
+export type { CreateRoomPayload, CreateSubmissionPayload, Room, RoomListItem, RoomStatus, RoundState, Player, Challenge, Example, TestCaseResult, SubmissionResult, ScoreBreakdown, RoundResult, GameResult, GameStanding } from "./interfaces"
 
 export const rooms = {
   create: (payload: CreateRoomPayload) =>
     api.post<{ roomId: string; hostToken: string }>("/rooms", payload),
+  list: () => api.get<RoomListItem[]>("/rooms"),
   getById: (roomId: string) => api.get<Room>(`/rooms/${roomId}`),
 }
 
