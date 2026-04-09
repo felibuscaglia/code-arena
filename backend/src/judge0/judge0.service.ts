@@ -34,7 +34,7 @@ export class Judge0Service {
     const result = await this.judge0Client.createSubmission({
       source_code: sourceCode,
       language_id: LANGUAGE_IDS[language],
-      cpu_time_limit: 5,
+      cpu_time_limit: 10,
       memory_limit: 128000,
     });
 

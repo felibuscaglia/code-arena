@@ -40,6 +40,10 @@ export class RoomsGateway implements OnGatewayDisconnect {
 
     if (!room) return;
 
+    this.logger.log(
+      `Player disconnected ${client.id} room=${roomId} remaining=${room.players.size} status=${room.status}`,
+    );
+
     if (room.players.size === 0) {
       clearTimeout(room.nextRoundTimeout);
       this.roomsService.delete(roomId);
@@ -55,6 +59,9 @@ export class RoomsGateway implements OnGatewayDisconnect {
         currentRoundState.timeout = undefined;
       }
       clearTimeout(room.nextRoundTimeout);
+      this.logger.warn(
+        `Ending game early room=${roomId} reason=insufficient-players`,
+      );
       this.emitGameEnded(roomId);
       return;
     }
@@ -97,6 +104,10 @@ export class RoomsGateway implements OnGatewayDisconnect {
       hostToken,
     );
 
+    this.logger.log(
+      `Player joined ${client.id} room=${roomId} displayName=${displayName} count=${existingRoom?.players.size ?? '?'}/${existingRoom?.maxPlayers ?? '-'}`,
+    );
+
     client.join(roomId);
 
     client.to(roomId).emit('player-joined', player);
@@ -129,7 +140,16 @@ export class RoomsGateway implements OnGatewayDisconnect {
 
     const challengeId = room.challenges[room.currentRound - 1];
     const challenge = await this.challengesService.getChallengeForRound(challengeId);
-    if (!challenge) return;
+    if (!challenge) {
+      this.logger.error(
+        `Cannot start round room=${roomId} round=${room.currentRound} challengeId=${challengeId} reason=challenge-missing`,
+      );
+      return;
+    }
+
+    this.logger.log(
+      `Starting round room=${roomId} round=${room.currentRound}/${room.roundCount} players=${room.players.size} challengeId=${challengeId}`,
+    );
 
     this.roomsService.updateStatus(roomId, RoomStatus.IN_PROGRESS);
     this.roomsService.startRound(roomId);
@@ -175,6 +195,10 @@ export class RoomsGateway implements OnGatewayDisconnect {
 
     const allSubmitted =
       roundState.submittedPlayerIds.length === room.players.size;
+
+    this.logger.log(
+      `Submission received room=${payload.roomId} round=${room.currentRound} player=${client.id} progress=${roundState.submittedPlayerIds.length}/${room.players.size} language=${payload.language}`,
+    );
 
     this.server
       .to(payload.roomId)
@@ -228,8 +252,12 @@ export class RoomsGateway implements OnGatewayDisconnect {
     const room = this.roomsService.findById(roomId);
     if (!room) return;
 
+    const reason =
+      roundState.submittedPlayerIds.length === room.players.size
+        ? 'all-submitted'
+        : 'timeout';
     this.logger.log(
-      `emitRoundEnded called for room ${roomId} (round ${room.currentRound})`,
+      `Round ended room=${roomId} round=${room.currentRound} reason=${reason} submitted=${roundState.submittedPlayerIds.length}/${room.players.size}`,
     );
 
     clearTimeout(roundState.timeout);
@@ -276,6 +304,10 @@ export class RoomsGateway implements OnGatewayDisconnect {
       }, 60_000);
     }
 
+    this.logger.log(
+      `Round result room=${roomId} round=${room.currentRound - 1} winner=${winner ?? 'none'} gameOver=${isGameOver}`,
+    );
+
     this.server.to(roomId).emit('end-round', { scores, winner });
 
     if (isGameOver) {
@@ -286,8 +318,6 @@ export class RoomsGateway implements OnGatewayDisconnect {
   private emitGameEnded(roomId: string) {
     const room = this.roomsService.findById(roomId);
     if (!room) return;
-
-    this.logger.log(`emitGameEnded called for room ${roomId}`);
 
     const totals = new Map<string, number>();
     for (const round of room.rounds) {
@@ -305,6 +335,9 @@ export class RoomsGateway implements OnGatewayDisconnect {
       : null;
 
     this.roomsService.updateStatus(roomId, RoomStatus.FINISHED);
+    this.logger.log(
+      `Game ended room=${roomId} winner=${winner ?? 'none'} players=${standings.length}`,
+    );
     this.server.to(roomId).emit('end-game', { standings, winner });
   }
 }

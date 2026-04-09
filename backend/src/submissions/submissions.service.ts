@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { ChallengesService } from '../challenges/challenges.service';
 import { Judge0Service } from '../judge0/judge0.service';
@@ -16,6 +16,8 @@ const HARNESS_BUILDERS: Record<string, typeof buildJavascriptHarness> = {
 
 @Injectable()
 export class SubmissionsService {
+  private readonly logger = new Logger(SubmissionsService.name);
+
   constructor(
     private readonly challengesService: ChallengesService,
     private readonly judge0Service: Judge0Service,
@@ -52,6 +54,11 @@ export class SubmissionsService {
     const totalMemoryUsage = judge0Response.memory || 0;
 
     if (judge0Response.stderr || judge0Response.compile_output) {
+      const errKind = judge0Response.compile_output ? 'compile' : 'runtime';
+      const errMsg = (judge0Response.stderr ?? judge0Response.compile_output ?? '').slice(0, 200);
+      this.logger.warn(
+        `Judge0 ${errKind} error challenge=${dto.challengeId} language=${dto.language} msg=${errMsg}`,
+      );
       return {
         testCases: cases.map((_, i) => ({
           case: i,
@@ -72,7 +79,10 @@ export class SubmissionsService {
     let parsed: { results?: SubmissionResult['testCases'] };
     try {
       parsed = JSON.parse(judge0Response.stdout ?? '{}');
-    } catch {
+    } catch (err) {
+      this.logger.error(
+        `Judge0 stdout JSON parse failed challenge=${dto.challengeId} language=${dto.language} stdout=${(judge0Response.stdout ?? '').slice(0, 200)}`,
+      );
       parsed = {};
     }
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { Player } from './interfaces/player.interface';
@@ -10,6 +10,7 @@ const ROOM_MAX_LIFETIME_MS = 5.5 * 60 * 60 * 1000;
 
 @Injectable()
 export class RoomsService {
+  private readonly logger = new Logger(RoomsService.name);
   private readonly rooms = new Map<string, Room>();
   private readonly playerRoomBySocketId = new Map<string, string>();
 
@@ -36,6 +37,9 @@ export class RoomsService {
       ROOM_MAX_LIFETIME_MS,
     );
     this.rooms.set(roomId, room);
+    this.logger.log(
+      `Room created ${roomId} difficulty=${dto.difficulty} rounds=${dto.roundCount} maxPlayers=${dto.maxPlayers ?? '-'} public=${dto.public ?? false}`,
+    );
     return { roomId, hostToken };
   }
 
@@ -85,8 +89,12 @@ export class RoomsService {
 
   delete(roomId: string): void {
     const room = this.rooms.get(roomId);
-    if (room?.cleanupTimeout) clearTimeout(room.cleanupTimeout);
+    if (!room) return;
+    if (room.cleanupTimeout) clearTimeout(room.cleanupTimeout);
     this.rooms.delete(roomId);
+    this.logger.log(
+      `Room deleted ${roomId} status=${room.status} players=${room.players.size}`,
+    );
   }
 
   updateStatus(roomId: string, status: RoomStatus): void {

@@ -1,5 +1,5 @@
 const PATTERNS: Record<string, RegExp> = {
-  javascript: /function\s+(\w+)/,
+  javascript: /function\s+(\w+)|(?:const|let|var)\s+(\w+)\s*=\s*(?:\([^)]*\)\s*=>|function\b)/,
   python: /def\s+(\w+)/,
 };
 
@@ -14,5 +14,5 @@ export function extractFunctionName(
     throw new Error(`Could not extract function name from ${language} starter code`);
   }
 
-  return match[1];
+  return match[1] ?? match[2];
 }
