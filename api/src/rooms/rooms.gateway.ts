@@ -167,6 +167,7 @@ export class RoomsGateway implements OnGatewayDisconnect {
     if (!room) return;
 
     const roundState = room.rounds[room.currentRound - 1];
+    if (roundState.submittedPlayerIds.includes(client.id)) return;
     roundState.submittedPlayerIds.push(client.id);
 
     const allSubmitted =

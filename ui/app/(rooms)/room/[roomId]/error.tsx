@@ -1,6 +1,8 @@
 "use client"
 
+import { useEffect } from "react"
 import Link from "next/link"
+import * as Sentry from "@sentry/nextjs"
 import { ArrowLeft, AlertCircle, Globe } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { LogoIcon } from "@/components/ui/logo"
@@ -8,6 +10,13 @@ import { RoomError } from "@/lib/contexts/room/room-context"
 
 export default function RoomErrorPage({ error }: { error: Error }) {
   const isRoomError = error instanceof RoomError
+
+  useEffect(() => {
+    // Skip expected user-facing states (404, join conflicts) — only report unexpected crashes.
+    if (isRoomError) return
+    Sentry.captureException(error)
+  }, [error, isRoomError])
+
   const isNotFound = isRoomError && error.status === 404
   const heading = isNotFound
     ? "Room not found"

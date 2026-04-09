@@ -47,8 +47,6 @@ export function RoomContent({ roomId }: RoomContentProps) {
 
   if (gameResult) return <FinalResultsScreen />
 
-  console.log({ roundResult });
-
   if (roundResult) return <RoundResultsScreen />
 
   switch (room.status) {

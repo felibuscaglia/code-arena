@@ -38,6 +38,7 @@ export function CodeEditorPanel() {
   const [isRunning, setIsRunning] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [testResults, setTestResults] = useState<TestCaseResult[] | null>(null)
+  const [runError, setRunError] = useState<string | null>(null)
   const [cooldownSeconds, setCooldownSeconds] = useState(0)
 
   useEffect(() => {
@@ -54,6 +55,7 @@ export function CodeEditorPanel() {
   async function handleRunTests() {
     if (!challenge || isRunning || cooldownSeconds > 0) return
     setIsRunning(true)
+    setRunError(null)
     try {
       const { data } = await submissions.create(
         { challengeId: challenge.id, language, code, roomId },
@@ -66,7 +68,7 @@ export function CodeEditorPanel() {
         const retryAfter = Number(response.headers?.["retry-after"]) || 2
         setCooldownSeconds(retryAfter)
       } else {
-        throw error
+        setRunError("Couldn't run your tests. Please try again.")
       }
     } finally {
       setIsRunning(false)
@@ -148,7 +150,7 @@ export function CodeEditorPanel() {
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={35} minSize={15}>
-          <TestResultsPanel results={testResults} isRunning={isRunning} />
+          <TestResultsPanel results={testResults} isRunning={isRunning} error={runError} />
         </ResizablePanel>
       </ResizablePanelGroup>
 

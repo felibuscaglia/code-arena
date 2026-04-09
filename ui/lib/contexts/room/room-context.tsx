@@ -157,6 +157,7 @@ export function RoomProvider({
       socket.off("end-round", handleEndRound)
       socket.off("end-game", handleEndGame)
       socket.off("exception", handleException)
+      socket.disconnect()
     }
   }, [])
 

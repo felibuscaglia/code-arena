@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowRight, Loader2, Globe, Lock } from "lucide-react"
+import { ArrowRight, Loader2, Globe, Lock, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -17,6 +17,7 @@ const PLAYER_OPTIONS = [2, 3, 4, 5, 6, 7, 8]
 export function RoomConfigForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [name, setName] = useState("")
   const [rounds, setRounds] = useState(3)
   const [roundTime, setRoundTime] = useState(10)
@@ -31,12 +32,21 @@ export function RoomConfigForm() {
     )
   }
 
+  const trimmedName = name.trim()
+  const canSubmit = trimmedName.length > 0 && languages.length > 0 && !isLoading
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    if (!canSubmit) {
+      if (trimmedName.length === 0) setError("Please give the room a name.")
+      else if (languages.length === 0) setError("Pick at least one language.")
+      return
+    }
+    setError(null)
     setIsLoading(true)
     try {
       const { data } = await rooms.create({
-        name,
+        name: trimmedName,
         roundCount: rounds,
         roundTime,
         difficulty,
@@ -47,6 +57,7 @@ export function RoomConfigForm() {
       sessionStorage.setItem(`hostToken:${data.roomId}`, data.hostToken)
       router.push(`/room/${data.roomId}`)
     } catch {
+      setError("Couldn't create the room. Please try again.")
       setIsLoading(false)
     }
   }
@@ -198,11 +209,20 @@ export function RoomConfigForm() {
 
       {/* Submit */}
       <div className="px-6 py-5">
+        {error && (
+          <div
+            role="alert"
+            className="mb-3 flex items-start gap-2 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger"
+          >
+            <AlertCircle className="mt-0.5 size-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
         <Button
           type="submit"
           size="lg"
-          disabled={isLoading}
-          className={`h-11 w-full ${!isLoading ? "glow-primary" : ""}`}
+          disabled={!canSubmit}
+          className={`h-11 w-full ${canSubmit ? "glow-primary" : ""}`}
         >
           {isLoading ? (
             <>

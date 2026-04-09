@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { RotateCw, Timer, Signal } from "lucide-react"
 import { RoomPlayers } from "./room-players"
+import { ReportBugButton } from "./report-bug-button"
 
 interface RoomInfoSummaryProps {
   roomId: string
@@ -60,11 +61,10 @@ export function RoomInfoSummary({ roomId }: RoomInfoSummaryProps) {
         </Badge>
       </div>
 
-      {room.status === "in_progress" && (
-        <div className="ml-auto">
-          <RoomPlayers />
-        </div>
-      )}
+      <div className="ml-auto flex items-center gap-2">
+        {room.status === "in_progress" && <RoomPlayers />}
+        <ReportBugButton />
+      </div>
     </div>
   )
 }

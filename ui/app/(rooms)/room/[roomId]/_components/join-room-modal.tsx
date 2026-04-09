@@ -38,7 +38,6 @@ export function JoinRoomModal({ roomId }: JoinRoomModalProps) {
   const [open, setOpen] = useState(true)
 
   const canJoin = displayName.trim().length > 0 && selectedAvatar !== null
-  const selectedEmoji = AVATARS.find((a) => a.id === selectedAvatar)?.emoji
 
   function handleJoin() {
     if (!canJoin) return
