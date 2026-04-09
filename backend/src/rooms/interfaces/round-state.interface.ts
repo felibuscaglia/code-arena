@@ -6,4 +6,5 @@ export interface RoundState {
   scores: Map<string, Promise<ScoreBreakdown>>;
   resolvedScores: Map<string, ScoreBreakdown>;
   timeout?: ReturnType<typeof setTimeout>;
+  ended?: boolean;
 }

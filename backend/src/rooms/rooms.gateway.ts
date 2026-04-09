@@ -60,7 +60,7 @@ export class RoomsGateway implements OnGatewayDisconnect {
     }
 
     const roundState = room.rounds[room.currentRound - 1];
-    if (!roundState) return;
+    if (!roundState || roundState.ended) return;
 
     const alreadySubmitted = roundState.submittedPlayerIds.includes(client.id);
     if (alreadySubmitted) return;
@@ -169,6 +169,7 @@ export class RoomsGateway implements OnGatewayDisconnect {
     if (!room) return;
 
     const roundState = room.rounds[room.currentRound - 1];
+    if (!roundState || roundState.ended) return;
     if (roundState.submittedPlayerIds.includes(client.id)) return;
     roundState.submittedPlayerIds.push(client.id);
 
@@ -221,6 +222,9 @@ export class RoomsGateway implements OnGatewayDisconnect {
   }
 
   private async emitRoundEnded(roomId: string, roundState: RoundState) {
+    if (roundState.ended) return;
+    roundState.ended = true;
+
     const room = this.roomsService.findById(roomId);
     if (!room) return;
 
@@ -260,18 +264,23 @@ export class RoomsGateway implements OnGatewayDisconnect {
             scores[a].total >= scores[b].total ? a : b,
           )
         : null;
-    this.server.to(roomId).emit('end-round', { scores, winner });
 
+    // Atomic block: advance state and schedule next round BEFORE emitting,
+    // so no observer ever sees "round ended" while currentRound still points
+    // at the finished round.
     room.currentRound++;
-
-    if (room.currentRound > room.roundCount) {
-      this.emitGameEnded(roomId);
-      return;
+    const isGameOver = room.currentRound > room.roundCount;
+    if (!isGameOver) {
+      room.nextRoundTimeout = setTimeout(() => {
+        this.handleStartGame({ roomId });
+      }, 60_000);
     }
 
-    room.nextRoundTimeout = setTimeout(() => {
-      this.handleStartGame({ roomId });
-    }, 60_000);
+    this.server.to(roomId).emit('end-round', { scores, winner });
+
+    if (isGameOver) {
+      this.emitGameEnded(roomId);
+    }
   }
 
   private emitGameEnded(roomId: string) {
