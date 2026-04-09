@@ -69,7 +69,12 @@ export class SubmissionsService {
       };
     }
 
-    const parsed = JSON.parse(judge0Response.stdout ?? '{}');
+    let parsed: { results?: SubmissionResult['testCases'] };
+    try {
+      parsed = JSON.parse(judge0Response.stdout ?? '{}');
+    } catch {
+      parsed = {};
+    }
 
     return {
       testCases: parsed.results ?? [],
