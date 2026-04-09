@@ -6,6 +6,8 @@ import { Room } from './interfaces/room.interface';
 import { RoomStatus } from './enums';
 import { ChallengesService } from '../challenges/challenges.service';
 
+const ROOM_MAX_LIFETIME_MS = 5.5 * 60 * 60 * 1000;
+
 @Injectable()
 export class RoomsService {
   private readonly rooms = new Map<string, Room>();
@@ -20,7 +22,7 @@ export class RoomsService {
       dto.difficulty,
       dto.roundCount,
     );
-    this.rooms.set(roomId, {
+    const room: Room = {
       ...dto,
       players: new Map(),
       status: RoomStatus.WAITING,
@@ -28,7 +30,12 @@ export class RoomsService {
       challenges,
       currentRound: 1,
       rounds: [],
-    });
+    };
+    room.cleanupTimeout = setTimeout(
+      () => this.delete(roomId),
+      ROOM_MAX_LIFETIME_MS,
+    );
+    this.rooms.set(roomId, room);
     return { roomId, hostToken };
   }
 
@@ -77,6 +84,8 @@ export class RoomsService {
   }
 
   delete(roomId: string): void {
+    const room = this.rooms.get(roomId);
+    if (room?.cleanupTimeout) clearTimeout(room.cleanupTimeout);
     this.rooms.delete(roomId);
   }
 

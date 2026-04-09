@@ -38,13 +38,15 @@ export class RoomsGateway implements OnGatewayDisconnect {
     this.roomsService.removePlayer(roomId, client.id);
     this.server.to(roomId).emit('player-left', client.id);
 
-    if (!room || room.status !== RoomStatus.IN_PROGRESS) return;
+    if (!room) return;
 
     if (room.players.size === 0) {
       clearTimeout(room.nextRoundTimeout);
       this.roomsService.delete(roomId);
       return;
     }
+
+    if (room.status !== RoomStatus.IN_PROGRESS) return;
 
     if (room.players.size === 1 && room.currentRound < room.roundCount) {
       const currentRoundState = room.rounds[room.currentRound - 1];

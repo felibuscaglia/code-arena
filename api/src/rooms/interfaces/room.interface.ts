@@ -11,4 +11,5 @@ export interface Room extends CreateRoomDto {
   currentRound: number;
   rounds: RoundState[];
   nextRoundTimeout?: ReturnType<typeof setTimeout>;
+  cleanupTimeout?: ReturnType<typeof setTimeout>;
 }
