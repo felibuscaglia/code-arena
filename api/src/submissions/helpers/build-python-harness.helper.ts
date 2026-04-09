@@ -5,12 +5,14 @@ export function buildPythonHarness(
   fnName: string,
   testCases: TestCase[],
 ): string {
+  const payload = Buffer.from(JSON.stringify(testCases)).toString('base64');
+
   return `
-import json, io, sys
+import base64, json, io, sys
 
 ${userCode}
 
-__cases = json.loads('${JSON.stringify(testCases).replace(/\\/g, '\\\\').replace(/'/g, "\\'")}')
+__cases = json.loads(base64.b64decode('${payload}').decode('utf-8'))
 __orig_print = print
 __case_logs = []
 
