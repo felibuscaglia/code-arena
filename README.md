@@ -1,6 +1,6 @@
 # Code Arena
 
-A real-time competitive coding platform. Players join a room, race through the same LeetCode-style challenge, and get scored on whether their solution is correct, how fast it runs, how much memory it uses, how quickly they submitted, and how concise the code is. Think Kahoot, but for coding interviews.
+A real-time competitive coding platform. Players join a room, race through the same LeetCode-style challenge, and get scored on whether their solution is correct, how fast it runs, how much memory it uses, how quickly they submitted, and how concise the code is.
 
 ## The Product
 
