@@ -50,7 +50,7 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>
-          <TooltipProvider>{children}</TooltipProvider>
+          <TooltipProvider><main>{children}</main></TooltipProvider>
         </ThemeProvider>
       </body>
     </html>
