@@ -15,7 +15,7 @@ export default async function OgImage() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#0f0f18",
+          backgroundColor: "#09090f",
           position: "relative",
           overflow: "hidden",
         }}
@@ -26,62 +26,60 @@ export default async function OgImage() {
             position: "absolute",
             inset: 0,
             backgroundImage:
-              "radial-gradient(circle, rgba(140,130,200,0.07) 1px, transparent 1px)",
-            backgroundSize: "24px 24px",
+              "radial-gradient(circle, rgba(109,91,247,0.045) 1px, transparent 1px)",
+            backgroundSize: "28px 28px",
             display: "flex",
           }}
         />
 
-        {/* Primary glow */}
+        {/* Wide ambient glow */}
         <div
           style={{
             position: "absolute",
-            top: "50%",
+            top: "40%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 600,
-            height: 400,
+            width: 800,
+            height: 500,
             borderRadius: "50%",
             background:
-              "radial-gradient(circle, rgba(79,57,246,0.15) 0%, transparent 70%)",
+              "radial-gradient(ellipse, rgba(109,91,247,0.12) 0%, rgba(109,91,247,0.03) 50%, transparent 72%)",
             display: "flex",
           }}
         />
 
-        {/* Logo icon (code brackets) */}
+        {/* Tight logo glow */}
+        <div
+          style={{
+            position: "absolute",
+            top: "36%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 280,
+            height: 280,
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle, rgba(109,91,247,0.22) 0%, transparent 70%)",
+            display: "flex",
+          }}
+        />
+
+        {/* Logo mark — battle badge */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            marginBottom: 32,
+            marginBottom: 36,
           }}
         >
-          <svg
-            width="72"
-            height="72"
-            viewBox="0 0 32 32"
-            fill="none"
-          >
+          <svg width="120" height="120" viewBox="0 0 32 32" fill="none">
+            {/* Rounded badge with opposing chevron cutouts */}
             <path
-              d="M13 7L5 16L13 25"
-              stroke="white"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M19 7L27 16L19 25"
-              stroke="white"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M18 9L14 23"
-              stroke="#6d5bf7"
-              strokeWidth="2"
-              strokeLinecap="round"
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M6 0H26A6 6 0 0132 6V26A6 6 0 0126 32H6A6 6 0 010 26V6A6 6 0 016 0ZM7 7L17 16L7 25V21L13 16L7 11ZM25 7L15 16L25 25V21L19 16L25 11Z"
+              fill="#6d5bf7"
             />
           </svg>
         </div>
@@ -91,15 +89,15 @@ export default async function OgImage() {
           style={{
             display: "flex",
             alignItems: "baseline",
-            marginBottom: 20,
+            marginBottom: 16,
           }}
         >
           <span
             style={{
-              fontSize: 72,
-              fontWeight: 700,
+              fontSize: 78,
+              fontWeight: 800,
               color: "white",
-              letterSpacing: "-2px",
+              letterSpacing: "-3px",
               lineHeight: 1,
             }}
           >
@@ -107,10 +105,10 @@ export default async function OgImage() {
           </span>
           <span
             style={{
-              fontSize: 72,
-              fontWeight: 700,
+              fontSize: 78,
+              fontWeight: 800,
               color: "#6d5bf7",
-              letterSpacing: "-2px",
+              letterSpacing: "-3px",
               lineHeight: 1,
             }}
           >
@@ -121,9 +119,10 @@ export default async function OgImage() {
         {/* Tagline */}
         <div
           style={{
-            fontSize: 28,
-            color: "rgba(255,255,255,0.6)",
-            letterSpacing: "0.5px",
+            fontSize: 22,
+            color: "rgba(255,255,255,0.45)",
+            letterSpacing: "3px",
+            textTransform: "uppercase",
             display: "flex",
           }}
         >
@@ -134,8 +133,8 @@ export default async function OgImage() {
         <div
           style={{
             display: "flex",
-            gap: 16,
-            marginTop: 40,
+            gap: 14,
+            marginTop: 44,
           }}
         >
           {["Head-to-Head", "Live Scoring", "No Signup"].map((label) => (
@@ -144,13 +143,13 @@ export default async function OgImage() {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 8,
-                padding: "8px 20px",
+                padding: "8px 24px",
                 borderRadius: 999,
-                border: "1px solid rgba(109,91,247,0.3)",
-                backgroundColor: "rgba(109,91,247,0.08)",
-                fontSize: 16,
-                color: "rgba(255,255,255,0.7)",
+                border: "1px solid rgba(109,91,247,0.2)",
+                backgroundColor: "rgba(109,91,247,0.06)",
+                fontSize: 15,
+                color: "rgba(255,255,255,0.45)",
+                letterSpacing: "0.5px",
               }}
             >
               {label}
@@ -162,10 +161,11 @@ export default async function OgImage() {
         <div
           style={{
             position: "absolute",
-            bottom: 32,
-            fontSize: 18,
-            color: "rgba(255,255,255,0.3)",
-            letterSpacing: "1px",
+            bottom: 28,
+            fontSize: 15,
+            color: "rgba(255,255,255,0.18)",
+            letterSpacing: "3px",
+            textTransform: "uppercase",
             display: "flex",
           }}
         >

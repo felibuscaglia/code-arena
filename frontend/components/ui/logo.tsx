@@ -10,25 +10,12 @@ function LogoIcon({ className, ...props }: React.ComponentProps<"svg">) {
       aria-hidden="true"
       {...props}
     >
+      {/* Rounded badge with opposing chevron cutouts */}
       <path
-        d="M13 7L5 16L13 25"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M19 7L27 16L19 25"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M18 9L14 23"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M6 0H26A6 6 0 0132 6V26A6 6 0 0126 32H6A6 6 0 010 26V6A6 6 0 016 0ZM7 7L17 16L7 25V21L13 16L7 11ZM25 7L15 16L25 25V21L19 16L25 11Z"
+        fill="currentColor"
         className="text-primary"
       />
     </svg>
